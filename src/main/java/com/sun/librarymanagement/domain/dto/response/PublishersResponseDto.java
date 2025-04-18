@@ -11,11 +11,11 @@ public class PublishersResponseDto {
 
     private List<PublisherResponseDto> results;
 
-    long page;
+    private long page;
 
     @JsonProperty("total_pages")
-    long totalPages;
+    private long totalPages;
 
     @JsonProperty("total_results")
-    long totalResults;
+    private long totalResults;
 }

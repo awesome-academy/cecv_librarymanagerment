@@ -7,17 +7,25 @@ import com.sun.librarymanagement.domain.entity.PublisherEntity;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
 import com.sun.librarymanagement.repository.PublisherRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class PublisherService {
 
     @Autowired
     private PublisherRepository publisherRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     public PublisherResponseDto addPublisher(PublisherRequestDto publisherRequestDto) {
         checkIfPublisherExists(publisherRequestDto.getName());
@@ -39,26 +47,32 @@ public class PublisherService {
     }
 
     public PublisherResponseDto getPublisher(long id) {
-        PublisherEntity publisherEntities = getPublisherEntityById(id);
+        PublisherEntity publisherEntities = publisherRepository.findById(id).orElseThrow(
+                () -> new AppException(AppError.PUBLISHER_NOT_FOUND)
+        );
         return new PublisherResponseDto(publisherEntities.getId(), publisherEntities.getName());
     }
 
+    @Transactional
     public PublisherResponseDto updatePublisher(long id, PublisherRequestDto publisherRequestDto) {
         checkIfPublisherExists(publisherRequestDto.getName());
-        PublisherEntity currentPublisherEntity = getPublisherEntityById(id);
+        PublisherEntity currentPublisherEntity = getPublisherEntityByIdWithLock(id);
         currentPublisherEntity.setName(publisherRequestDto.getName());
         PublisherEntity result = publisherRepository.save(currentPublisherEntity);
         return new PublisherResponseDto(result.getId(), result.getName());
     }
 
+    @Transactional
     public void deletePublisher(long id) {
-        PublisherEntity currentPublisherEntity = getPublisherEntityById(id);
+        PublisherEntity currentPublisherEntity = getPublisherEntityByIdWithLock(id);
         publisherRepository.delete(currentPublisherEntity);
     }
 
-    private PublisherEntity getPublisherEntityById(long id) {
-        return publisherRepository.findById(id).orElseThrow(
-                () -> new AppException(AppError.PUBLISHER_NOT_FOUND)
+    private PublisherEntity getPublisherEntityByIdWithLock(long id) {
+        return Optional.ofNullable(
+                entityManager.find(PublisherEntity.class, id, LockModeType.PESSIMISTIC_WRITE)).orElseThrow(
+                () -> new AppException(AppError.PUBLISHER_NOT_FOUND
+                )
         );
     }
 

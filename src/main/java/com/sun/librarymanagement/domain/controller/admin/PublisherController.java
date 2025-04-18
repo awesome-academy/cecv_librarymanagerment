@@ -1,4 +1,4 @@
-package com.sun.librarymanagement.domain.controller;
+package com.sun.librarymanagement.domain.controller.admin;
 
 import com.sun.librarymanagement.domain.dto.request.PublisherRequestDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
@@ -7,19 +7,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("adminPublisherController")
 @RequestMapping("/api/v1/admin/publishers")
-@PreAuthorize("hasRole('ADMIN')")
-public class AdminPublisherController {
+public class PublisherController extends AdminController {
 
     @Autowired
     private PublisherService publisherService;
