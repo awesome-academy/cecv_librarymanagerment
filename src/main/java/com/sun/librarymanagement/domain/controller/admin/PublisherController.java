@@ -4,17 +4,17 @@ import com.sun.librarymanagement.domain.dto.request.PublisherRequestDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
 import com.sun.librarymanagement.service.PublisherService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("adminPublisherController")
 @RequestMapping("/api/v1/admin/publishers")
+@AllArgsConstructor()
 public class PublisherController extends AdminController {
 
-    @Autowired
-    private PublisherService publisherService;
+    private final PublisherService publisherService;
 
     @PostMapping
     public ResponseEntity<PublisherResponseDto> addPublisher(
