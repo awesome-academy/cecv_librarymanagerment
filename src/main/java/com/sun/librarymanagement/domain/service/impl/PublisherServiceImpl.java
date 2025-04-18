@@ -8,8 +8,6 @@ import com.sun.librarymanagement.domain.repository.PublisherRepository;
 import com.sun.librarymanagement.domain.service.PublisherService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,15 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class PublisherServiceImpl implements PublisherService {
 
     private final PublisherRepository publisherRepository;
-
-    private final EntityManager entityManager;
 
     @Override
     public PublisherResponseDto addPublisher(PublisherRequestDto publisherRequestDto) {
@@ -74,10 +68,8 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     private PublisherEntity getPublisherEntityByIdWithLock(long id) {
-        return Optional.ofNullable(
-            entityManager.find(PublisherEntity.class, id, LockModeType.PESSIMISTIC_WRITE)).orElseThrow(
-            () -> new AppException(AppError.PUBLISHER_NOT_FOUND
-            )
+        return publisherRepository.findByIdWithLock(id).orElseThrow(
+            () -> new AppException(AppError.PUBLISHER_NOT_FOUND)
         );
     }
 
