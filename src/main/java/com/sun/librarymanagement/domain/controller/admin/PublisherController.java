@@ -18,17 +18,17 @@ public class PublisherController extends AdminController {
 
     @PostMapping
     public ResponseEntity<PublisherResponseDto> addPublisher(
-            @RequestBody @Valid PublisherRequestDto publisher
+        @RequestBody @Valid PublisherRequestDto publisher
     ) {
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(publisherService.addPublisher(publisher));
+            .status(HttpStatus.CREATED)
+            .body(publisherService.addPublisher(publisher));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<PublisherResponseDto> updatePublisher(
-            @PathVariable Long id,
-            @Valid @RequestBody PublisherRequestDto publisher
+        @PathVariable Long id,
+        @Valid @RequestBody PublisherRequestDto publisher
     ) {
         return ResponseEntity.ok(publisherService.updatePublisher(id, publisher));
     }

@@ -6,7 +6,7 @@ import com.sun.librarymanagement.domain.dto.response.PublishersResponseDto;
 import com.sun.librarymanagement.domain.entity.PublisherEntity;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
-import com.sun.librarymanagement.repository.PublisherRepository;
+import com.sun.librarymanagement.domain.repository.PublisherRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
@@ -29,7 +29,7 @@ public class PublisherService {
     public PublisherResponseDto addPublisher(PublisherRequestDto publisherRequestDto) {
         checkIfPublisherExists(publisherRequestDto.getName());
         PublisherEntity result = publisherRepository.save(
-                new PublisherEntity(publisherRequestDto.getName()));
+            new PublisherEntity(publisherRequestDto.getName()));
         return new PublisherResponseDto(result.getId(), result.getName());
     }
 
@@ -37,17 +37,17 @@ public class PublisherService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<PublisherEntity> publisherEntities = publisherRepository.findAll(pageable);
         return new PublishersResponseDto(publisherEntities.stream().map(
-                (e) -> new PublisherResponseDto(e.getId(), e.getName())
+            (e) -> new PublisherResponseDto(e.getId(), e.getName())
         ).toList(),
-                pageNumber,
-                publisherEntities.getTotalPages(),
-                publisherEntities.getTotalElements()
+            pageNumber,
+            publisherEntities.getTotalPages(),
+            publisherEntities.getTotalElements()
         );
     }
 
     public PublisherResponseDto getPublisher(long id) {
         PublisherEntity publisherEntities = publisherRepository.findById(id).orElseThrow(
-                () -> new AppException(AppError.PUBLISHER_NOT_FOUND)
+            () -> new AppException(AppError.PUBLISHER_NOT_FOUND)
         );
         return new PublisherResponseDto(publisherEntities.getId(), publisherEntities.getName());
     }
@@ -69,9 +69,9 @@ public class PublisherService {
 
     private PublisherEntity getPublisherEntityByIdWithLock(long id) {
         return Optional.ofNullable(
-                entityManager.find(PublisherEntity.class, id, LockModeType.PESSIMISTIC_WRITE)).orElseThrow(
-                () -> new AppException(AppError.PUBLISHER_NOT_FOUND
-                )
+            entityManager.find(PublisherEntity.class, id, LockModeType.PESSIMISTIC_WRITE)).orElseThrow(
+            () -> new AppException(AppError.PUBLISHER_NOT_FOUND
+            )
         );
     }
 

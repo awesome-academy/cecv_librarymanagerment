@@ -1,4 +1,4 @@
-package com.sun.librarymanagement.repository;
+package com.sun.librarymanagement.domain.repository;
 
 import com.sun.librarymanagement.domain.entity.PublisherEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
