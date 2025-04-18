@@ -2,7 +2,7 @@ package com.sun.librarymanagement.domain.controller.admin;
 
 import com.sun.librarymanagement.domain.dto.request.PublisherRequestDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
-import com.sun.librarymanagement.service.PublisherService;
+import com.sun.librarymanagement.domain.service.PublisherService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

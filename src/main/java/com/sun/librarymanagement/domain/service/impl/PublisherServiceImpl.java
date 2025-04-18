@@ -1,12 +1,13 @@
-package com.sun.librarymanagement.service;
+package com.sun.librarymanagement.domain.service.impl;
 
 import com.sun.librarymanagement.domain.dto.request.PublisherRequestDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PublishersResponseDto;
 import com.sun.librarymanagement.domain.entity.PublisherEntity;
+import com.sun.librarymanagement.domain.repository.PublisherRepository;
+import com.sun.librarymanagement.domain.service.PublisherService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
-import com.sun.librarymanagement.domain.repository.PublisherRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
@@ -20,12 +21,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PublisherService {
+public class PublisherServiceImpl implements PublisherService {
 
     private final PublisherRepository publisherRepository;
 
     private final EntityManager entityManager;
 
+    @Override
     public PublisherResponseDto addPublisher(PublisherRequestDto publisherRequestDto) {
         checkIfPublisherExists(publisherRequestDto.getName());
         PublisherEntity result = publisherRepository.save(
@@ -33,6 +35,7 @@ public class PublisherService {
         return new PublisherResponseDto(result.getId(), result.getName());
     }
 
+    @Override
     public PublishersResponseDto getPublishers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<PublisherEntity> publisherEntities = publisherRepository.findAll(pageable);
@@ -45,6 +48,7 @@ public class PublisherService {
         );
     }
 
+    @Override
     public PublisherResponseDto getPublisher(long id) {
         PublisherEntity publisherEntities = publisherRepository.findById(id).orElseThrow(
             () -> new AppException(AppError.PUBLISHER_NOT_FOUND)
@@ -52,6 +56,7 @@ public class PublisherService {
         return new PublisherResponseDto(publisherEntities.getId(), publisherEntities.getName());
     }
 
+    @Override
     @Transactional
     public PublisherResponseDto updatePublisher(long id, PublisherRequestDto publisherRequestDto) {
         checkIfPublisherExists(publisherRequestDto.getName());
@@ -61,6 +66,7 @@ public class PublisherService {
         return new PublisherResponseDto(result.getId(), result.getName());
     }
 
+    @Override
     @Transactional
     public void deletePublisher(long id) {
         PublisherEntity currentPublisherEntity = getPublisherEntityByIdWithLock(id);
