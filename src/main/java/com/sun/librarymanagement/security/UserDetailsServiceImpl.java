@@ -22,6 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 AppUserDetails.builder()
                     .id(entity.getId())
                     .email(entity.getEmail())
+                    .role(entity.getRole().name())
                     .build()
             )
             .orElse(null);
