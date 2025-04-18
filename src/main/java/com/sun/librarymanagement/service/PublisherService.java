@@ -10,7 +10,7 @@ import com.sun.librarymanagement.repository.PublisherRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +19,12 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PublisherService {
 
-    @Autowired
-    private PublisherRepository publisherRepository;
+    private final PublisherRepository publisherRepository;
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public PublisherResponseDto addPublisher(PublisherRequestDto publisherRequestDto) {
         checkIfPublisherExists(publisherRequestDto.getName());
@@ -79,7 +78,7 @@ public class PublisherService {
     private void checkIfPublisherExists(String publisherName) {
         boolean isExist = publisherRepository.existsByName(publisherName);
         if (isExist) {
-            throw new AppException(AppError.NAME_TAKEN);
+            throw new AppException(AppError.PUBLISHER_ALREADY_EXISTS);
         }
     }
 }

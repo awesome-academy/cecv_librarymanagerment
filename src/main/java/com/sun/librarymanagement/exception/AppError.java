@@ -15,7 +15,7 @@ public enum AppError {
     USER_ALREADY_VERIFIED("User is already verified.", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND("User not found.", HttpStatus.NOT_FOUND),
     PUBLISHER_NOT_FOUND("Publisher not found", HttpStatus.NOT_FOUND),
-    NAME_TAKEN("Name has already been taken", HttpStatus.UNPROCESSABLE_ENTITY),
+    PUBLISHER_ALREADY_EXISTS("Publisher already exists.", HttpStatus.CONFLICT),
     ;
 
     private final String message;
