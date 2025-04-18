@@ -25,7 +25,7 @@ public class PublisherController extends AdminController {
             .body(publisherService.addPublisher(publisher));
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<PublisherResponseDto> updatePublisher(
         @PathVariable Long id,
         @Valid @RequestBody PublisherRequestDto publisher
