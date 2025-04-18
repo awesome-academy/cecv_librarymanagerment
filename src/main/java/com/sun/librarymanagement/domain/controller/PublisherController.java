@@ -17,7 +17,8 @@ public class PublisherController {
     @GetMapping
     public ResponseEntity<PublishersResponseDto> getPublishers(
             @RequestParam(defaultValue = "0", name = "page_number") int pageNumber,
-            @RequestParam(defaultValue = "10", name = "page_size") int pageSize) {
+            @RequestParam(defaultValue = "10", name = "page_size") int pageSize
+    ) {
         return ResponseEntity.ok(publisherService.getPublishers(pageNumber, pageSize));
 
     }
