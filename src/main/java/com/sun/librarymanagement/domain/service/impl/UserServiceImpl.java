@@ -44,9 +44,9 @@ public class UserServiceImpl implements UserService {
             .role(UserRole.USER)
             .verifyToken(verifyToken)
             .build();
-        userEntity.setIsVerified(true); // TODO("Pending function to send verification email.")
+        userEntity.setIsVerified(true); // TODO: Pending function to send verification email.
         userRepository.save(userEntity);
-        /* TODO("Pending function to send verification email.")
+        /* TODO: Pending function to send verification email.
         mailService.sendVerificationEmail(user.getEmail(), verifyToken);
          */
         return new SuccessResponseDto("Account created successfully. Please check your email to verify your account.");

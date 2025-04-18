@@ -1,6 +1,7 @@
 package com.sun.librarymanagement.domain.entity;
 
 import com.sun.librarymanagement.domain.model.UserRole;
+import com.sun.librarymanagement.utils.Constant;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,10 +15,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserEntity extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = Constant.USERNAME_MAX_LENGTH)
     private String username;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = Constant.EMAIL_MAX_LENGTH)
     private String email;
 
     @Column(nullable = false)
