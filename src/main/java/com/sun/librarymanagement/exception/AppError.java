@@ -16,6 +16,8 @@ public enum AppError {
     USER_NOT_FOUND("User not found.", HttpStatus.NOT_FOUND),
     PUBLISHER_NOT_FOUND("Publisher not found", HttpStatus.NOT_FOUND),
     PUBLISHER_ALREADY_EXISTS("Publisher already exists.", HttpStatus.CONFLICT),
+    AUTHOR_NOT_FOUND("Author not found", HttpStatus.NOT_FOUND),
+    AUTHOR_ALREADY_EXISTS("Author already exists.", HttpStatus.CONFLICT),
     ;
 
     private final String message;

@@ -33,7 +33,13 @@ public class WebSecurityConfiguration {
             .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/api/v1/users/**")
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/v1/publishers", "/api/v1/publishers/*")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/v1/publishers",
+                        "/api/v1/publishers/*",
+                        "/api/v1/authors",
+                        "/api/v1/authors/*"
+                    )
                     .permitAll()
                     .anyRequest()
                     .authenticated()
