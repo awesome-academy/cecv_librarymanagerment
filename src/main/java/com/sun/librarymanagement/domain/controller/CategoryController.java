@@ -3,6 +3,7 @@ package com.sun.librarymanagement.domain.controller;
 import com.sun.librarymanagement.domain.dto.request.CategoryRequest;
 import com.sun.librarymanagement.domain.dto.response.CategoryResponse;
 import com.sun.librarymanagement.domain.service.CategoryService;
+import com.sun.librarymanagement.utils.ApiPaths;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping(ApiPaths.CATEGORIES)
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -21,7 +22,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryResponse> addCategory(@RequestBody @Valid CategoryRequest request) {
         CategoryResponse response = categoryService.addCategory(request);
-        URI location = URI.create("/api/v1/categories/" + response.getId());
+        URI location = URI.create(ApiPaths.CATEGORIES + "/" + response.getId());
         return ResponseEntity.created(location).body(response);
     }
 
@@ -44,7 +45,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCategory(@PathVariable long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
