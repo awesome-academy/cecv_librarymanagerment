@@ -1,15 +1,15 @@
 package com.sun.librarymanagement.domain.controller;
 
-import com.sun.librarymanagement.domain.dto.request.CategoryRequest;
 import com.sun.librarymanagement.domain.dto.response.CategoryResponse;
 import com.sun.librarymanagement.domain.service.CategoryService;
 import com.sun.librarymanagement.utils.ApiPaths;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -18,13 +18,6 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
-
-    @PostMapping
-    public ResponseEntity<CategoryResponse> addCategory(@RequestBody @Valid CategoryRequest request) {
-        CategoryResponse response = categoryService.addCategory(request);
-        URI location = URI.create(ApiPaths.CATEGORIES + "/" + response.getId());
-        return ResponseEntity.created(location).body(response);
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategory(@PathVariable long id) {
@@ -36,17 +29,5 @@ public class CategoryController {
     public ResponseEntity<List<CategoryResponse>> getCategories() {
         List<CategoryResponse> response = categoryService.getCategories();
         return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryRequest request) {
-        CategoryResponse response = categoryService.updateCategory(id, request);
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable long id) {
-        categoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
     }
 }

@@ -45,9 +45,9 @@ public class WebSecurityConfiguration {
                         "/api/v1/authors/*"
                     )
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, ApiPaths.CATEGORIES).hasRole(UserRole.ADMIN.name())
-                    .requestMatchers(HttpMethod.PUT, ApiPaths.CATEGORIES + "/**").hasRole(UserRole.ADMIN.name())
-                    .requestMatchers(HttpMethod.DELETE, ApiPaths.CATEGORIES + "/**").hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.POST, ApiPaths.CATEGORIES_ADMIN).hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.PUT, ApiPaths.CATEGORIES_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.DELETE, ApiPaths.CATEGORIES_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
                     .anyRequest()
                     .authenticated()
             )
