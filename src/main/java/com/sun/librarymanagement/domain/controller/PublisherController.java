@@ -3,9 +3,11 @@ package com.sun.librarymanagement.domain.controller;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PublishersResponseDto;
 import com.sun.librarymanagement.domain.service.PublisherService;
+import com.sun.librarymanagement.security.AppUserDetails;
 import com.sun.librarymanagement.utils.Constant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,7 +27,10 @@ public class PublisherController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PublisherResponseDto> getPublisher(@PathVariable Long id) {
-        return ResponseEntity.ok(publisherService.getPublisher(id));
+    public ResponseEntity<PublisherResponseDto> getPublisher(
+        @PathVariable Long id,
+        @AuthenticationPrincipal AppUserDetails currentUser
+    ) {
+        return ResponseEntity.ok(publisherService.getPublisher(id, currentUser));
     }
 }

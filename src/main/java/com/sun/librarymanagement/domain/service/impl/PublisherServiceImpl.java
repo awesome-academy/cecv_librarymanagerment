@@ -4,10 +4,14 @@ import com.sun.librarymanagement.domain.dto.request.PublisherRequestDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PublishersResponseDto;
 import com.sun.librarymanagement.domain.entity.PublisherEntity;
+import com.sun.librarymanagement.domain.model.FollowInfo;
+import com.sun.librarymanagement.domain.model.FollowType;
+import com.sun.librarymanagement.domain.repository.FollowRepository;
 import com.sun.librarymanagement.domain.repository.PublisherRepository;
 import com.sun.librarymanagement.domain.service.PublisherService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
+import com.sun.librarymanagement.security.AppUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +24,8 @@ import org.springframework.stereotype.Service;
 public class PublisherServiceImpl implements PublisherService {
 
     private final PublisherRepository publisherRepository;
+
+    private final FollowRepository followRepository;
 
     @Override
     public PublisherResponseDto addPublisher(PublisherRequestDto publisherRequestDto) {
@@ -43,11 +49,18 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public PublisherResponseDto getPublisher(long id) {
+    public PublisherResponseDto getPublisher(long id, AppUserDetails currentUser) {
         PublisherEntity publisherEntities = publisherRepository.findById(id).orElseThrow(
             () -> new AppException(AppError.PUBLISHER_NOT_FOUND)
         );
-        return new PublisherResponseDto(publisherEntities.getId(), publisherEntities.getName());
+        boolean isFollowing = currentUser != null && followRepository.findById(
+            new FollowInfo(currentUser.getId(), publisherEntities.getId(), FollowType.PUBLISHER)
+        ).isPresent();
+        return new PublisherResponseDto(
+            publisherEntities.getId(),
+            publisherEntities.getName(),
+            isFollowing
+        );
     }
 
     @Override
