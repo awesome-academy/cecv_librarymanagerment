@@ -3,6 +3,7 @@ package com.sun.librarymanagement.security;
 import com.sun.librarymanagement.domain.model.UserRole;
 import com.sun.librarymanagement.utils.ApiPaths;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -50,6 +51,11 @@ public class WebSecurityConfiguration {
                     .requestMatchers(HttpMethod.POST, ApiPaths.CATEGORIES_ADMIN).hasRole(UserRole.ADMIN.name())
                     .requestMatchers(HttpMethod.PUT, ApiPaths.CATEGORIES_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
                     .requestMatchers(HttpMethod.DELETE, ApiPaths.CATEGORIES_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.POST, ApiPaths.BOOKS_ADMIN).hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.GET, ApiPaths.BOOKS + "/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, ApiPaths.BOOKS).permitAll()
+                    .requestMatchers(HttpMethod.PUT, ApiPaths.BOOKS_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.DELETE, ApiPaths.BOOKS_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
                     .anyRequest()
                     .authenticated()
             )
@@ -58,5 +64,10 @@ public class WebSecurityConfiguration {
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }

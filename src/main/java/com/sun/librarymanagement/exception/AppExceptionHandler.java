@@ -24,11 +24,6 @@ public class AppExceptionHandler {
         return responseErrorMessages(messages, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<AppErrorMessages> handleException(Exception exception) {
-        return responseErrorMessages(List.of("internal server error"), HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
     private ResponseEntity<AppErrorMessages> responseErrorMessages(List<String> messages, HttpStatus status) {
         AppErrorMessages errorMessages = new AppErrorMessages();
         messages.forEach(errorMessages::append);
