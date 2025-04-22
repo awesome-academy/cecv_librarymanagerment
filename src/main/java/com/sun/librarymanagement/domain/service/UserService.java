@@ -1,17 +1,14 @@
 package com.sun.librarymanagement.domain.service;
 
-import com.sun.librarymanagement.domain.dto.request.AuthenticationRequestDto;
-import com.sun.librarymanagement.domain.dto.request.RegistrationRequestDto;
-import com.sun.librarymanagement.domain.dto.response.SuccessResponseDto;
 import com.sun.librarymanagement.domain.dto.response.UserResponseDto;
 
 public interface UserService {
 
-    SuccessResponseDto registration(final RegistrationRequestDto user);
+    UserResponseDto.Multiple getUsers(final int pageNumber, final int pageSize);
 
-    SuccessResponseDto verifyEmail(final String token);
+    UserResponseDto getUser(final Long id);
 
-    SuccessResponseDto resendVerification(final String email);
+    UserResponseDto activeUser(final Long id);
 
-    UserResponseDto authentication(final AuthenticationRequestDto user);
+    UserResponseDto inactiveUser(final Long id);
 }

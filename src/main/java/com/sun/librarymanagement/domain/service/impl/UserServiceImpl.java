@@ -1,106 +1,85 @@
 package com.sun.librarymanagement.domain.service.impl;
 
-import com.sun.librarymanagement.domain.dto.request.AuthenticationRequestDto;
-import com.sun.librarymanagement.domain.dto.request.RegistrationRequestDto;
-import com.sun.librarymanagement.domain.dto.response.SuccessResponseDto;
 import com.sun.librarymanagement.domain.dto.response.UserResponseDto;
 import com.sun.librarymanagement.domain.entity.UserEntity;
 import com.sun.librarymanagement.domain.model.UserRole;
 import com.sun.librarymanagement.domain.repository.UserRepository;
-import com.sun.librarymanagement.domain.service.MailService;
 import com.sun.librarymanagement.domain.service.UserService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
-import com.sun.librarymanagement.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final MailService mailService;
-    private final JwtUtils jwtUtils;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public SuccessResponseDto registration(RegistrationRequestDto user) {
-        userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail())
-            .stream()
-            .findAny()
-            .ifPresent(entity -> {
-                throw new AppException(AppError.ACCOUNT_ALREADY_EXISTS);
-            });
+    public UserResponseDto.Multiple getUsers(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<UserEntity> page = userRepository.findByRole(UserRole.USER, pageable);
 
-        String verifyToken = UUID.randomUUID().toString();
-        UserEntity userEntity = UserEntity.builder()
-            .username(user.getUsername())
-            .email(user.getEmail())
-            .password(passwordEncoder.encode(user.getPassword()))
-            .role(UserRole.USER)
-            .verifyToken(verifyToken)
+        return UserResponseDto.Multiple.builder()
+            .results(convertToUserList(page))
+            .page(pageNumber)
+            .totalPages(page.getTotalPages())
+            .totalResults(page.getTotalElements())
             .build();
-        userEntity.setIsVerified(true); // TODO: Pending function to send verification email.
-        userRepository.save(userEntity);
-        /* TODO: Pending function to send verification email.
-        mailService.sendVerificationEmail(user.getEmail(), verifyToken);
-         */
-        return new SuccessResponseDto("Account created successfully. Please check your email to verify your account.");
     }
 
     @Override
-    public SuccessResponseDto verifyEmail(String token) {
-        UserEntity userEntity = userRepository.findByVerifyToken(token)
-            .orElseThrow(() -> new AppException(AppError.VERIFICATION_TOKEN_INVALID));
-
-        userEntity.setIsVerified(true);
-        userEntity.setVerifyToken(null);
-        userRepository.save(userEntity);
-
-        return new SuccessResponseDto("Account verified successfully.");
-    }
-
-    @Override
-    public SuccessResponseDto resendVerification(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email)
+    public UserResponseDto getUser(Long id) {
+        UserEntity user = userRepository.findById(id)
             .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
 
-        if (!userEntity.getIsVerified()) {
-            throw new AppException(AppError.USER_ALREADY_VERIFIED);
-        }
-
-        String verifyToken = UUID.randomUUID().toString();
-        userEntity.setVerifyToken(verifyToken);
-        userRepository.save(userEntity);
-        mailService.sendVerificationEmail(email, verifyToken);
-
-        return new SuccessResponseDto("Verification email has been resent.");
+        return convertEntityToDto(user);
     }
 
+    @Transactional
     @Override
-    public UserResponseDto authentication(AuthenticationRequestDto user) {
-        UserEntity userEntity = userRepository.findByEmail(user.getEmail())
-            .filter(entity -> passwordEncoder.matches(user.getPassword(), entity.getPassword()))
-            .orElseThrow(() -> new AppException(AppError.LOGIN_INFO_INVALID));
+    public UserResponseDto activeUser(Long id) {
+        UserEntity user = userRepository.findByIdWithLock(id)
+            .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
 
-        if (!userEntity.getIsVerified()) {
-            throw new AppException(AppError.ACCOUNT_NOT_VERIFIED);
-        } else if (!userEntity.getIsActive()) {
-            throw new AppException(AppError.ACCOUNT_NOT_ACTIVE);
-        }
+        user.setIsActive(true);
+        userRepository.save(user);
 
-        return convertEntityToDto(userEntity);
+        return convertEntityToDto(user);
+    }
+
+    @Transactional
+    @Override
+    public UserResponseDto inactiveUser(Long id) {
+        UserEntity user = userRepository.findByIdWithLock(id)
+            .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
+
+        user.setIsActive(false);
+        userRepository.save(user);
+
+        return convertEntityToDto(user);
     }
 
     private UserResponseDto convertEntityToDto(UserEntity entity) {
         return UserResponseDto.builder()
-            .token(jwtUtils.encode(entity.getEmail()))
             .username(entity.getUsername())
             .email(entity.getEmail())
+            .isActive(entity.getIsActive())
+            .isVerified(entity.getIsVerified())
             .build();
+    }
+
+    private List<UserResponseDto> convertToUserList(Page<UserEntity> userEntities) {
+        return userEntities.stream()
+            .map(this::convertEntityToDto)
+            .collect(Collectors.toList());
     }
 }
