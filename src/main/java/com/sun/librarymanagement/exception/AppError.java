@@ -18,6 +18,10 @@ public enum AppError {
     PUBLISHER_ALREADY_EXISTS("Publisher already exists.", HttpStatus.CONFLICT),
     AUTHOR_NOT_FOUND("Author not found", HttpStatus.NOT_FOUND),
     AUTHOR_ALREADY_EXISTS("Author already exists.", HttpStatus.CONFLICT),
+    PUBLISHER_ALREADY_FOLLOWED("Publisher already followed.", HttpStatus.CONFLICT),
+    PUBLISHER_NOT_FOLLOWED("Publisher is not followed.", HttpStatus.NOT_FOUND),
+    AUTHOR_ALREADY_FOLLOWED("Author already followed.", HttpStatus.CONFLICT),
+    AUTHOR_NOT_FOLLOWED("Author is not followed.", HttpStatus.NOT_FOUND),
     ;
 
     private final String message;

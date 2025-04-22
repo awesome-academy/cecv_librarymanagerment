@@ -4,10 +4,14 @@ import com.sun.librarymanagement.domain.dto.request.AuthorRequestDto;
 import com.sun.librarymanagement.domain.dto.response.AuthorResponseDto;
 import com.sun.librarymanagement.domain.dto.response.AuthorsResponseDto;
 import com.sun.librarymanagement.domain.entity.AuthorEntity;
+import com.sun.librarymanagement.domain.model.FollowInfo;
+import com.sun.librarymanagement.domain.model.FollowType;
 import com.sun.librarymanagement.domain.repository.AuthorRepository;
+import com.sun.librarymanagement.domain.repository.FollowRepository;
 import com.sun.librarymanagement.domain.service.AuthorService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
+import com.sun.librarymanagement.security.AppUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +24,8 @@ import org.springframework.stereotype.Service;
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
+
+    private final FollowRepository followRepository;
 
     @Override
     public AuthorResponseDto addAuthor(AuthorRequestDto authorRequestDto) {
@@ -56,15 +62,19 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public AuthorResponseDto getAuthor(long id) {
+    public AuthorResponseDto getAuthor(long id, AppUserDetails currentUser) {
         AuthorEntity authorEntity = authorRepository.findById(id).orElseThrow(
             () -> new AppException(AppError.AUTHOR_NOT_FOUND)
         );
+        boolean isFollowing = currentUser != null && followRepository.findById(
+            new FollowInfo(currentUser.getId(), authorEntity.getId(), FollowType.AUTHOR)
+        ).isPresent();
         return new AuthorResponseDto(
             authorEntity.getId(),
             authorEntity.getName(),
             authorEntity.getBio(),
-            authorEntity.getDateOfBirth()
+            authorEntity.getDateOfBirth(),
+            isFollowing
         );
     }
 

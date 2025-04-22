@@ -68,6 +68,12 @@ public class UserServiceImpl implements UserService {
         return convertEntityToDto(user);
     }
 
+    @Override
+    public UserEntity getUserById(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
+    }
+
     private UserResponseDto convertEntityToDto(UserEntity entity) {
         return UserResponseDto.builder()
             .username(entity.getUsername())
