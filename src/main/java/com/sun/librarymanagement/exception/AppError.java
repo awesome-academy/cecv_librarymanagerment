@@ -22,6 +22,8 @@ public enum AppError {
     PUBLISHER_NOT_FOLLOWED("Publisher is not followed.", HttpStatus.NOT_FOUND),
     AUTHOR_ALREADY_FOLLOWED("Author already followed.", HttpStatus.CONFLICT),
     AUTHOR_NOT_FOLLOWED("Author is not followed.", HttpStatus.NOT_FOUND),
+    CATEGORY_ALREADY_EXISTS("Category already exists.", HttpStatus.CONFLICT),
+    CATEGORY_NOT_FOUND("Category not found", HttpStatus.NOT_FOUND),
     ;
 
     private final String message;

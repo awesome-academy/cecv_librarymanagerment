@@ -1,5 +1,7 @@
 package com.sun.librarymanagement.security;
 
+import com.sun.librarymanagement.domain.model.UserRole;
+import com.sun.librarymanagement.utils.ApiPaths;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +45,9 @@ public class WebSecurityConfiguration {
                         "/api/v1/authors/*"
                     )
                     .permitAll()
+                    .requestMatchers(HttpMethod.POST, ApiPaths.CATEGORIES_ADMIN).hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.PUT, ApiPaths.CATEGORIES_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(HttpMethod.DELETE, ApiPaths.CATEGORIES_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
                     .anyRequest()
                     .authenticated()
             )
