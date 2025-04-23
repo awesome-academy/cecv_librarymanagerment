@@ -35,7 +35,7 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.updateCurrentUserProfile(user, userDetails));
     }
 
-    @PostMapping("/me/email")
+    @PatchMapping("/me/email")
     public ResponseEntity<SuccessResponseDto> changeEmail(
         @RequestBody @Valid ChangeEmailRequestDto request,
         @AuthenticationPrincipal AppUserDetails userDetails
@@ -43,7 +43,7 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.changeEmail(request, userDetails));
     }
 
-    @PostMapping("/me/password")
+    @PatchMapping("/me/password")
     public ResponseEntity<SuccessResponseDto> changePassword(
         @RequestBody @Valid ChangePasswordRequestDto request,
         @AuthenticationPrincipal AppUserDetails userDetails

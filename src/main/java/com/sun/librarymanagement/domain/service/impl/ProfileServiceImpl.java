@@ -74,7 +74,10 @@ public class ProfileServiceImpl implements ProfileService {
             .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getOldPassword(), userEntity.getPassword())) {
-            throw new AppException(AppError.PASSWORD_INVALID);
+            throw new AppException(AppError.OLD_PASSWORD_INVALID);
+        }
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new AppException(AppError.PASSWORDS_DO_NOT_MATCH);
         }
         userEntity.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(userEntity);
