@@ -1,8 +1,8 @@
 package com.sun.librarymanagement.domain.service.impl;
 
-import com.sun.librarymanagement.domain.dto.request.BookRequest;
-import com.sun.librarymanagement.domain.dto.response.BookResponse;
-import com.sun.librarymanagement.domain.dto.response.BooksResponse;
+import com.sun.librarymanagement.domain.dto.request.BookRequestDto;
+import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
+import com.sun.librarymanagement.domain.dto.response.BooksResponseDto;
 import com.sun.librarymanagement.domain.entity.AuthorEntity;
 import com.sun.librarymanagement.domain.entity.BookEntity;
 import com.sun.librarymanagement.domain.entity.CategoryEntity;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,26 +36,26 @@ public class BookServiceImpl implements BookService {
     private final ModelMapper modelMapper;
 
     @Override
-    public BookResponse addBook(@NotNull BookRequest request) {
+    public BookResponseDto addBook(@NotNull BookRequestDto request) {
         PublisherEntity publisher = publisherRepository.findById(request.getPublisherId()).orElseThrow(() -> new AppException(AppError.PUBLISHER_NOT_FOUND));
         AuthorEntity author = authorRepository.findById(request.getAuthorId()).orElseThrow(() -> new AppException(AppError.AUTHOR_NOT_FOUND));
         Set<CategoryEntity> categories = request.getCategoryIds().stream().map(categoryId -> categoryRepository.findById(categoryId).orElseThrow(() -> new AppException(AppError.CATEGORY_NOT_FOUND))).collect(Collectors.toSet());
-        BookEntity book = bookRepository.save(new BookEntity(request.getName(), request.getDescription(), request.getImageUrl(), publisher, request.getQuantity(), 0, author, categories));
-        return modelMapper.map(book, BookResponse.class);
+        BookEntity book = bookRepository.save(BookEntity.builder().name(request.getName()).description(request.getDescription()).imageUrl(request.getImageUrl()).publisher(publisher).quantity(request.getQuantity()).availableQuantity(request.getQuantity()).author(author).categories(categories).build());
+        return modelMapper.map(book, BookResponseDto.class);
     }
 
     @Override
-    public BookResponse getBook(long id) {
+    public BookResponseDto getBook(long id) {
         BookEntity book = bookRepository.findById(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
-        return modelMapper.map(book, BookResponse.class);
+        return modelMapper.map(book, BookResponseDto.class);
     }
 
     @Override
-    public BooksResponse getBooks(int pageNumber, int pageSize) {
+    public BooksResponseDto getBooks(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<BookEntity> page = bookRepository.findAll(pageable);
-        return new BooksResponse(
-                page.stream().map(book -> modelMapper.map(book, BookResponse.class)).toList(),
+        return new BooksResponseDto(
+                page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
                 pageNumber,
                 page.getTotalPages(),
                 page.getTotalElements()
@@ -62,23 +63,27 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse updateBook(long id, @NotNull BookRequest request) {
+    @Transactional
+    public BookResponseDto updateBook(long id, @NotNull BookRequestDto request) {
         BookEntity currentBook = bookRepository.findById(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
         PublisherEntity publisher = publisherRepository.findById(request.getPublisherId()).orElseThrow(() -> new AppException(AppError.PUBLISHER_NOT_FOUND));
         AuthorEntity author = authorRepository.findById(request.getAuthorId()).orElseThrow(() -> new AppException(AppError.AUTHOR_NOT_FOUND));
         Set<CategoryEntity> categories = request.getCategoryIds().stream().map(categoryId -> categoryRepository.findById(categoryId).orElseThrow(() -> new AppException(AppError.CATEGORY_NOT_FOUND))).collect(Collectors.toSet());
+        int availableQuantity = Math.max(currentBook.getAvailableQuantity() + request.getQuantity() - currentBook.getQuantity(), 0);
         currentBook.setName(request.getName());
         currentBook.setDescription(request.getDescription());
         currentBook.setImageUrl(request.getImageUrl());
         currentBook.setQuantity(request.getQuantity());
+        currentBook.setAvailableQuantity(availableQuantity);
         currentBook.setPublisher(publisher);
         currentBook.setAuthor(author);
         currentBook.setCategories(categories);
         BookEntity book = bookRepository.save(currentBook);
-        return modelMapper.map(book, BookResponse.class);
+        return modelMapper.map(book, BookResponseDto.class);
     }
 
     @Override
+    @Transactional
     public void deleteBook(long id) {
         bookRepository.findById(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
         bookRepository.deleteById(id);

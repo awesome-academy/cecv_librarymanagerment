@@ -8,8 +8,8 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class BooksResponse {
-    private List<BookResponse> results;
+public class BooksResponseDto {
+    private List<BookResponseDto> results;
 
     private long page;
 

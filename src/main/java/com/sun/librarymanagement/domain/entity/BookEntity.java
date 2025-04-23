@@ -1,10 +1,7 @@
 package com.sun.librarymanagement.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -14,6 +11,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BookEntity extends BaseEntity {
     @Column(nullable = false)
     private String name;
@@ -39,9 +37,9 @@ public class BookEntity extends BaseEntity {
     private AuthorEntity author;
 
     @JoinTable(
-            name = "book_category",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
+        name = "book_category",
+        joinColumns = @JoinColumn(name = "book_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     @ManyToMany
     private Set<CategoryEntity> categories;

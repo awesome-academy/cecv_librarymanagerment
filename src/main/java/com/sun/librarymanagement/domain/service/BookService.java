@@ -1,19 +1,19 @@
 package com.sun.librarymanagement.domain.service;
 
-import com.sun.librarymanagement.domain.dto.request.BookRequest;
-import com.sun.librarymanagement.domain.dto.response.BookResponse;
-import com.sun.librarymanagement.domain.dto.response.BooksResponse;
+import com.sun.librarymanagement.domain.dto.request.BookRequestDto;
+import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
+import com.sun.librarymanagement.domain.dto.response.BooksResponseDto;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface BookService {
-    BookResponse addBook(BookRequest request);
+    BookResponseDto addBook(BookRequestDto request);
 
-    BookResponse getBook(long id);
+    BookResponseDto getBook(long id);
 
-    BooksResponse getBooks(int pageNumber, int pageSize);
+    BooksResponseDto getBooks(int pageNumber, int pageSize);
 
-    BookResponse updateBook(long id, BookRequest request);
+    BookResponseDto updateBook(long id, BookRequestDto request);
 
     void deleteBook(long id);
 }

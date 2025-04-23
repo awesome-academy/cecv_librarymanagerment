@@ -10,7 +10,7 @@ import lombok.Getter;
 import java.util.Set;
 
 @Getter
-public class BookRequest {
+public class BookRequestDto {
     @NotBlank(message = "Book name is required.")
     @Size(max = 255, message = "Book name must not exceed 255 characters.")
     private String name;
