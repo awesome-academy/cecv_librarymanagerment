@@ -3,6 +3,7 @@ package com.sun.librarymanagement.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -43,4 +44,7 @@ public class BookEntity extends BaseEntity {
     )
     @ManyToMany
     private Set<CategoryEntity> categories;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public BookResponseDto updateBook(long id, @NotNull BookRequestDto request) {
-        BookEntity currentBook = bookRepository.findById(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
+        BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
         PublisherEntity publisher = publisherRepository.findById(request.getPublisherId()).orElseThrow(() -> new AppException(AppError.PUBLISHER_NOT_FOUND));
         AuthorEntity author = authorRepository.findById(request.getAuthorId()).orElseThrow(() -> new AppException(AppError.AUTHOR_NOT_FOUND));
         Set<CategoryEntity> categories = request.getCategoryIds().stream().map(categoryId -> categoryRepository.findById(categoryId).orElseThrow(() -> new AppException(AppError.CATEGORY_NOT_FOUND))).collect(Collectors.toSet());
@@ -85,7 +86,8 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void deleteBook(long id) {
-        bookRepository.findById(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
-        bookRepository.deleteById(id);
+        BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
+        currentBook.setDeletedAt(LocalDateTime.now());
+        bookRepository.save(currentBook);
     }
 }
