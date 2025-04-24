@@ -3,14 +3,16 @@ package com.sun.librarymanagement.domain.controller.admin;
 import com.sun.librarymanagement.domain.dto.request.PublisherRequestDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
 import com.sun.librarymanagement.domain.service.PublisherService;
+import com.sun.librarymanagement.utils.ApiPaths;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController("adminPublisherController")
-@RequestMapping("/api/v1/admin/publishers")
+@RequestMapping(ApiPaths.PUBLISHERS_ADMIN)
 @AllArgsConstructor()
 public class PublisherController extends AdminController {
 
@@ -20,9 +22,9 @@ public class PublisherController extends AdminController {
     public ResponseEntity<PublisherResponseDto> addPublisher(
         @RequestBody @Valid PublisherRequestDto publisher
     ) {
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(publisherService.addPublisher(publisher));
+        PublisherResponseDto response = publisherService.addPublisher(publisher);
+        URI location = URI.create(ApiPaths.PUBLISHERS + "/" + response.getId());
+        return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("/{id}")

@@ -6,6 +6,7 @@ import com.sun.librarymanagement.domain.dto.request.ResendVerificationEmailReque
 import com.sun.librarymanagement.domain.dto.response.SuccessResponseDto;
 import com.sun.librarymanagement.domain.dto.response.UserResponseDto;
 import com.sun.librarymanagement.domain.service.AuthService;
+import com.sun.librarymanagement.utils.ApiPaths;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping(ApiPaths.USERS)
 @RequiredArgsConstructor
 public class AuthController {
 

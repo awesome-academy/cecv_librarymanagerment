@@ -4,13 +4,14 @@ import com.sun.librarymanagement.domain.dto.response.AuthorResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
 import com.sun.librarymanagement.domain.service.FollowService;
 import com.sun.librarymanagement.security.AppUserDetails;
+import com.sun.librarymanagement.utils.ApiPaths;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/follows")
+@RequestMapping(ApiPaths.FOLLOWS)
 @RequiredArgsConstructor
 public class FollowController {
 

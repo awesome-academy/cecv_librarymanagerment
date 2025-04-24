@@ -1,6 +1,7 @@
 package com.sun.librarymanagement.domain.service.impl;
 
 import com.sun.librarymanagement.domain.service.MailService;
+import com.sun.librarymanagement.utils.ApiPaths;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -21,7 +22,7 @@ public class MailServiceImpl implements MailService {
     public void sendVerificationEmail(String to, String token) {
         String verificationLink = UriComponentsBuilder
             .fromUriString(verificationBaseUrl)
-            .path("/api/v1/users/verify")
+            .path(ApiPaths.USERS + "/verify")
             .queryParam("token", token)
             .toUriString();
         String emailContent = "Click the link to verify your account:\n" + verificationLink;

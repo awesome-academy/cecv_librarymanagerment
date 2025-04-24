@@ -2,7 +2,7 @@ package com.sun.librarymanagement.domain.service.impl;
 
 import com.sun.librarymanagement.domain.dto.request.AuthorRequestDto;
 import com.sun.librarymanagement.domain.dto.response.AuthorResponseDto;
-import com.sun.librarymanagement.domain.dto.response.AuthorsResponseDto;
+import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.entity.AuthorEntity;
 import com.sun.librarymanagement.domain.model.FollowInfo;
 import com.sun.librarymanagement.domain.model.FollowType;
@@ -46,10 +46,10 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public AuthorsResponseDto getAuthors(int pageNumber, int pageSize) {
+    public PaginatedResponseDto<AuthorResponseDto> getAuthors(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<AuthorEntity> authorEntities = authorRepository.findAll(pageable);
-        return new AuthorsResponseDto(authorEntities.stream().map(
+        return new PaginatedResponseDto<>(authorEntities.stream().map(
             (e) -> new AuthorResponseDto(
                 e.getId(),
                 e.getName()
