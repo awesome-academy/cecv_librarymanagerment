@@ -29,6 +29,8 @@ public enum AppError {
     CATEGORY_ALREADY_EXISTS("Category already exists.", HttpStatus.CONFLICT),
     CATEGORY_NOT_FOUND("Category not found", HttpStatus.NOT_FOUND),
     BOOK_NOT_FOUND("Book not found", HttpStatus.NOT_FOUND),
+    FAVORITE_NOT_FOUND("Favorite not found.", HttpStatus.NOT_FOUND),
+    BOOK_ALREADY_FAVORITED("Favorite already favorited.", HttpStatus.CONFLICT),
     ;
 
     private final String message;

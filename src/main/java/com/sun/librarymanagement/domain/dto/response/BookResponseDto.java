@@ -32,4 +32,7 @@ public class BookResponseDto {
     private AuthorResponseDto author;
 
     private Set<CategoryResponseDto> categories;
+
+    @JsonProperty("is_favorited")
+    private boolean isFavorited;
 }
