@@ -47,4 +47,12 @@ public class BookEntity extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @JoinTable(
+        name = "favorites",
+        joinColumns = @JoinColumn(name = "book_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @ManyToMany
+    private Set<UserEntity> favorites;
 }

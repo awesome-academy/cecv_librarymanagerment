@@ -1,19 +1,19 @@
 package com.sun.librarymanagement.domain.service.impl;
 
 import com.sun.librarymanagement.domain.dto.request.BookRequestDto;
+import com.sun.librarymanagement.domain.dto.request.SearchBookRequestDto;
 import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
-import com.sun.librarymanagement.domain.entity.AuthorEntity;
-import com.sun.librarymanagement.domain.entity.BookEntity;
-import com.sun.librarymanagement.domain.entity.CategoryEntity;
-import com.sun.librarymanagement.domain.entity.PublisherEntity;
+import com.sun.librarymanagement.domain.entity.*;
 import com.sun.librarymanagement.domain.repository.AuthorRepository;
 import com.sun.librarymanagement.domain.repository.BookRepository;
 import com.sun.librarymanagement.domain.repository.CategoryRepository;
 import com.sun.librarymanagement.domain.repository.PublisherRepository;
 import com.sun.librarymanagement.domain.service.BookService;
+import com.sun.librarymanagement.domain.service.UserService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
+import com.sun.librarymanagement.security.AppUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.sun.librarymanagement.utils.MapperConverter.isFavoritedConverter;
+
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -35,6 +37,7 @@ public class BookServiceImpl implements BookService {
     private final CategoryRepository categoryRepository;
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
     @Override
     public BookResponseDto addBook(@NotNull BookRequestDto request) {
@@ -46,9 +49,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponseDto getBook(long id) {
+    public BookResponseDto getBook(long id, AppUserDetails currentUser) {
         BookEntity book = bookRepository.findById(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
-        return modelMapper.map(book, BookResponseDto.class);
+        if (currentUser == null) {
+            return modelMapper.map(book, BookResponseDto.class);
+        }
+        return convertToBookResponseDto(book, currentUser.getId());
     }
 
     @Override
@@ -56,10 +62,10 @@ public class BookServiceImpl implements BookService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<BookEntity> page = bookRepository.findAll(pageable);
         return new PaginatedResponseDto<>(
-                page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
-                pageNumber,
-                page.getTotalPages(),
-                page.getTotalElements()
+            page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
+            pageNumber,
+            page.getTotalPages(),
+            page.getTotalElements()
         );
     }
 
@@ -89,5 +95,67 @@ public class BookServiceImpl implements BookService {
         BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
         currentBook.setDeletedAt(LocalDateTime.now());
         bookRepository.save(currentBook);
+    }
+
+    @Override
+    @Transactional
+    public PaginatedResponseDto<BookResponseDto> search(
+        SearchBookRequestDto request,
+        int pageNumber,
+        int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<BookEntity> page = bookRepository.searchBook(
+            request.getPublisher(),
+            request.getCategory(),
+            request.getAuthor(),
+            request.getName(),
+            request.getDescription(),
+            pageable
+        );
+        return new PaginatedResponseDto<>(
+            page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
+            pageNumber,
+            page.getTotalPages(),
+            page.getTotalElements()
+        );
+    }
+
+    @Override
+    @Transactional
+    public BookResponseDto favorite(long id, Long currentUserId) {
+        BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
+        UserEntity userEntity = userService.getUserById(currentUserId);
+        boolean isFavorite = currentBook.getFavorites().stream().anyMatch((e) -> e.getId().equals(userEntity.getId()));
+        if (isFavorite) {
+            throw new AppException(AppError.BOOK_ALREADY_FAVORITED);
+        }
+        currentBook.getFavorites().add(userEntity);
+        BookEntity book = bookRepository.save(currentBook);
+        return convertToBookResponseDto(book, currentUserId);
+    }
+
+    @Override
+    @Transactional
+    public void unfavorite(long id, Long currentUserId) {
+        BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
+        UserEntity userEntity = userService.getUserById(currentUserId);
+        boolean isFavorite = currentBook.getFavorites().stream().anyMatch((e) -> e.getId().equals(userEntity.getId()));
+        if (!isFavorite) {
+            throw new AppException(AppError.FAVORITE_NOT_FOUND);
+        }
+        currentBook.getFavorites().remove(userEntity);
+        bookRepository.save(currentBook);
+    }
+
+    private BookResponseDto convertToBookResponseDto(BookEntity bookEntity, Long currentUserId) {
+        return modelMapper
+            .typeMap(BookEntity.class, BookResponseDto.class)
+            .addMappings(
+                mapper -> mapper
+                    .using(isFavoritedConverter(bookEntity, currentUserId))
+                    .map(src -> src, BookResponseDto::setFavorited)
+            )
+            .map(bookEntity);
     }
 }
