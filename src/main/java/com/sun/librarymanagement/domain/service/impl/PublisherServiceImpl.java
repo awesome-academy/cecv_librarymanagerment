@@ -1,8 +1,8 @@
 package com.sun.librarymanagement.domain.service.impl;
 
 import com.sun.librarymanagement.domain.dto.request.PublisherRequestDto;
+import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PublisherResponseDto;
-import com.sun.librarymanagement.domain.dto.response.PublishersResponseDto;
 import com.sun.librarymanagement.domain.entity.PublisherEntity;
 import com.sun.librarymanagement.domain.model.FollowInfo;
 import com.sun.librarymanagement.domain.model.FollowType;
@@ -36,10 +36,10 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public PublishersResponseDto getPublishers(int pageNumber, int pageSize) {
+    public PaginatedResponseDto<PublisherResponseDto> getPublishers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<PublisherEntity> publisherEntities = publisherRepository.findAll(pageable);
-        return new PublishersResponseDto(publisherEntities.stream().map(
+        return new PaginatedResponseDto<>(publisherEntities.stream().map(
             (e) -> new PublisherResponseDto(e.getId(), e.getName())
         ).toList(),
             pageNumber,

@@ -3,14 +3,16 @@ package com.sun.librarymanagement.domain.controller.admin;
 import com.sun.librarymanagement.domain.dto.request.AuthorRequestDto;
 import com.sun.librarymanagement.domain.dto.response.AuthorResponseDto;
 import com.sun.librarymanagement.domain.service.AuthorService;
+import com.sun.librarymanagement.utils.ApiPaths;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController("adminAuthorController")
-@RequestMapping("/api/v1/admin/authors")
+@RequestMapping(ApiPaths.AUTHORS_ADMIN)
 @AllArgsConstructor()
 public class AuthorController extends AdminController {
 
@@ -20,9 +22,9 @@ public class AuthorController extends AdminController {
     public ResponseEntity<AuthorResponseDto> addAuthor(
         @RequestBody @Valid AuthorRequestDto author
     ) {
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(authorService.addAuthor(author));
+        AuthorResponseDto response = authorService.addAuthor(author);
+        URI location = URI.create(ApiPaths.AUTHORS + "/" + response.getId());
+        return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("/{id}")
@@ -34,7 +36,7 @@ public class AuthorController extends AdminController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePublisher(@PathVariable Long id) {
+    public ResponseEntity<?> deleteAuthor(@PathVariable Long id) {
         authorService.deleteAuthor(id);
         return ResponseEntity.noContent().build();
     }

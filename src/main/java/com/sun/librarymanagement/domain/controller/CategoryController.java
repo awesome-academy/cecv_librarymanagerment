@@ -1,6 +1,6 @@
 package com.sun.librarymanagement.domain.controller;
 
-import com.sun.librarymanagement.domain.dto.response.CategoryResponse;
+import com.sun.librarymanagement.domain.dto.response.CategoryResponseDto;
 import com.sun.librarymanagement.domain.service.CategoryService;
 import com.sun.librarymanagement.utils.ApiPaths;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +20,14 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getCategory(@PathVariable long id) {
-        CategoryResponse response = categoryService.getCategory(id);
+    public ResponseEntity<CategoryResponseDto> getCategory(@PathVariable long id) {
+        CategoryResponseDto response = categoryService.getCategory(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getCategories() {
-        List<CategoryResponse> response = categoryService.getCategories();
+    public ResponseEntity<List<CategoryResponseDto>> getCategories() {
+        List<CategoryResponseDto> response = categoryService.getCategories();
         return ResponseEntity.ok(response);
     }
 }

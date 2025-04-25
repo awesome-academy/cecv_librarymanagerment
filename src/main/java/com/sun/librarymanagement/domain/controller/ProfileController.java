@@ -7,6 +7,7 @@ import com.sun.librarymanagement.domain.dto.response.SuccessResponseDto;
 import com.sun.librarymanagement.domain.dto.response.UserResponseDto;
 import com.sun.librarymanagement.domain.service.ProfileService;
 import com.sun.librarymanagement.security.AppUserDetails;
+import com.sun.librarymanagement.utils.ApiPaths;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/profiles")
+@RequestMapping(ApiPaths.PROFILES)
 @RequiredArgsConstructor
 public class ProfileController {
 

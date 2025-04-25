@@ -2,7 +2,7 @@ package com.sun.librarymanagement.domain.service.impl;
 
 import com.sun.librarymanagement.domain.dto.request.BookRequestDto;
 import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
-import com.sun.librarymanagement.domain.dto.response.BooksResponseDto;
+import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.entity.AuthorEntity;
 import com.sun.librarymanagement.domain.entity.BookEntity;
 import com.sun.librarymanagement.domain.entity.CategoryEntity;
@@ -52,10 +52,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BooksResponseDto getBooks(int pageNumber, int pageSize) {
+    public PaginatedResponseDto<BookResponseDto> getBooks(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<BookEntity> page = bookRepository.findAll(pageable);
-        return new BooksResponseDto(
+        return new PaginatedResponseDto<>(
                 page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
                 pageNumber,
                 page.getTotalPages(),

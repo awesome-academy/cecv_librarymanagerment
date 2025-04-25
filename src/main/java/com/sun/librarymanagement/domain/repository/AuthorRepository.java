@@ -1,7 +1,6 @@
 package com.sun.librarymanagement.domain.repository;
 
 import com.sun.librarymanagement.domain.entity.AuthorEntity;
-import com.sun.librarymanagement.domain.entity.PublisherEntity;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

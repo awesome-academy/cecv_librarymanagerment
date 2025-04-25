@@ -38,19 +38,19 @@ public class WebSecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth ->
-                auth.requestMatchers("/api/v1/users/**")
+                auth.requestMatchers(ApiPaths.USERS + "/**")
                     .permitAll()
                     .requestMatchers(
                         HttpMethod.GET,
-                        "/api/v1/publishers",
-                        "/api/v1/publishers/*",
-                        "/api/v1/authors",
-                        "/api/v1/authors/*"
+                        ApiPaths.PUBLISHERS,
+                        ApiPaths.PUBLISHERS + "/*",
+                        ApiPaths.AUTHORS,
+                        ApiPaths.AUTHORS + "/*",
+                        ApiPaths.BOOKS,
+                        ApiPaths.BOOKS + "/*"
                     )
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, ApiPaths.BOOKS + "/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, ApiPaths.BOOKS).permitAll()
-                    .requestMatchers(ApiPaths.ADMIN + "/**").hasRole(UserRole.ADMIN.name())
+                    .requestMatchers(ApiPaths.BASE_API_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
                     .anyRequest()
                     .authenticated()
             )

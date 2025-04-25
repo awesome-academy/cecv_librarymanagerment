@@ -1,5 +1,6 @@
 package com.sun.librarymanagement.domain.service.impl;
 
+import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.dto.response.UserResponseDto;
 import com.sun.librarymanagement.domain.entity.UserEntity;
 import com.sun.librarymanagement.domain.model.UserRole;
@@ -24,16 +25,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserResponseDto.Multiple getUsers(int pageNumber, int pageSize) {
+    public PaginatedResponseDto<UserResponseDto> getUsers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<UserEntity> page = userRepository.findByRole(UserRole.USER, pageable);
 
-        return UserResponseDto.Multiple.builder()
-            .results(convertToUserList(page))
-            .page(pageNumber)
-            .totalPages(page.getTotalPages())
-            .totalResults(page.getTotalElements())
-            .build();
+        return new PaginatedResponseDto<>(
+            convertToUserList(page),
+            pageNumber,
+            page.getTotalPages(),
+            page.getTotalElements()
+        );
     }
 
     @Override

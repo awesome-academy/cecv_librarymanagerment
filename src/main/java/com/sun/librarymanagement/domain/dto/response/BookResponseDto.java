@@ -31,5 +31,5 @@ public class BookResponseDto {
 
     private AuthorResponseDto author;
 
-    private Set<CategoryResponse> categories;
+    private Set<CategoryResponseDto> categories;
 }
