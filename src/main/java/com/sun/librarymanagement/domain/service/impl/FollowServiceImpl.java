@@ -75,7 +75,7 @@ public class FollowServiceImpl implements FollowService {
         if (!author.isFollowing()) {
             throw new AppException(AppError.AUTHOR_NOT_FOLLOWED);
         }
-        FollowInfo followInfo = new FollowInfo(currentUser.getId(), authorId, FollowType.PUBLISHER);
+        FollowInfo followInfo = new FollowInfo(currentUser.getId(), authorId, FollowType.AUTHOR);
         followRepository.delete(new FollowEntity(followInfo, currentUserEntity));
         author.setFollowing(false);
         return author;
