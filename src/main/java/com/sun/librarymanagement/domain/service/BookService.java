@@ -1,6 +1,7 @@
 package com.sun.librarymanagement.domain.service;
 
 import com.sun.librarymanagement.domain.dto.request.BookRequestDto;
+import com.sun.librarymanagement.domain.dto.request.SearchBookRequestDto;
 import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.security.AppUserDetails;
@@ -18,17 +19,9 @@ public interface BookService {
 
     void deleteBook(long id);
 
-    PaginatedResponseDto<BookResponseDto> search(
-        String publisher,
-        String category,
-        String author,
-        String name,
-        String description,
-        int pageNumber,
-        int pageSize
-    );
+    PaginatedResponseDto<BookResponseDto> search(SearchBookRequestDto request, int pageNumber, int pageSize);
 
-    BookResponseDto favorite(long id, AppUserDetails userDetails);
+    BookResponseDto favorite(long id, Long currentUserId);
 
-    void unfavorite(long id, AppUserDetails userDetails);
+    void unfavorite(long id, Long currentUserId);
 }

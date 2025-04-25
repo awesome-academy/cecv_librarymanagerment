@@ -1,5 +1,6 @@
 package com.sun.librarymanagement.domain.controller;
 
+import com.sun.librarymanagement.domain.dto.request.SearchBookRequestDto;
 import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.service.BookService;
@@ -36,19 +37,13 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<BooksResponseDto> search(
-        @RequestParam(required = false) String publisher,
-        @RequestParam(required = false) String category,
-        @RequestParam(required = false) String author,
-        @RequestParam(required = false) String name,
-        @RequestParam(required = false) String description,
+    @PostMapping("/search")
+    public ResponseEntity<PaginatedResponseDto<BookResponseDto>> search(
+        @RequestBody SearchBookRequestDto request,
         @RequestParam(defaultValue = Constant.DEFAULT_PAGE_NUMBER, name = Constant.PAGE_NUMBER_PARAM) int pageNumber,
         @RequestParam(defaultValue = Constant.DEFAULT_PAGE_SIZE, name = Constant.PAGE_SIZE_PARAM) int pageSize
     ) {
-        return ResponseEntity.ok(
-            bookService.search(publisher, category, author, name, description, pageNumber, pageSize)
-        );
+        return ResponseEntity.ok(bookService.search(request, pageNumber, pageSize));
     }
 
     @PostMapping("{id}/favorite")
@@ -56,7 +51,7 @@ public class BookController {
         @PathVariable long id,
         @AuthenticationPrincipal AppUserDetails currentUser
     ) {
-        return ResponseEntity.ok(bookService.favorite(id, currentUser));
+        return ResponseEntity.ok(bookService.favorite(id, currentUser.getId()));
     }
 
     @DeleteMapping("{id}/favorite")
@@ -64,7 +59,7 @@ public class BookController {
         @PathVariable long id,
         @AuthenticationPrincipal AppUserDetails currentUser
     ) {
-        bookService.unfavorite(id, currentUser);
+        bookService.unfavorite(id, currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 }

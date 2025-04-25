@@ -50,6 +50,11 @@ public class WebSecurityConfiguration {
                         ApiPaths.BOOKS + "/*"
                     )
                     .permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        ApiPaths.BOOKS + "/search"
+                    )
+                    .permitAll()
                     .requestMatchers(ApiPaths.BASE_API_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
                     .anyRequest()
                     .authenticated()

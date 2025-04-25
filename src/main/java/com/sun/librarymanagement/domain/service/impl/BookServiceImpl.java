@@ -1,12 +1,9 @@
 package com.sun.librarymanagement.domain.service.impl;
 
 import com.sun.librarymanagement.domain.dto.request.BookRequestDto;
+import com.sun.librarymanagement.domain.dto.request.SearchBookRequestDto;
 import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
-import com.sun.librarymanagement.domain.entity.AuthorEntity;
-import com.sun.librarymanagement.domain.entity.BookEntity;
-import com.sun.librarymanagement.domain.entity.CategoryEntity;
-import com.sun.librarymanagement.domain.entity.PublisherEntity;
 import com.sun.librarymanagement.domain.entity.*;
 import com.sun.librarymanagement.domain.repository.AuthorRepository;
 import com.sun.librarymanagement.domain.repository.BookRepository;
@@ -65,10 +62,10 @@ public class BookServiceImpl implements BookService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<BookEntity> page = bookRepository.findAll(pageable);
         return new PaginatedResponseDto<>(
-                page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
-                pageNumber,
-                page.getTotalPages(),
-                page.getTotalElements()
+            page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
+            pageNumber,
+            page.getTotalPages(),
+            page.getTotalElements()
         );
     }
 
@@ -103,16 +100,19 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public PaginatedResponseDto<BookResponseDto> search(
-        String publisher,
-        String category,
-        String author,
-        String name,
-        String description,
+        SearchBookRequestDto request,
         int pageNumber,
         int pageSize
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<BookEntity> page = bookRepository.searchBook(publisher, category, author, name, description, pageable);
+        Page<BookEntity> page = bookRepository.searchBook(
+            request.getPublisher(),
+            request.getCategory(),
+            request.getAuthor(),
+            request.getName(),
+            request.getDescription(),
+            pageable
+        );
         return new PaginatedResponseDto<>(
             page.stream().map(book -> modelMapper.map(book, BookResponseDto.class)).toList(),
             pageNumber,
@@ -123,23 +123,23 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookResponseDto favorite(long id, AppUserDetails currentUser) {
+    public BookResponseDto favorite(long id, Long currentUserId) {
         BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
-        UserEntity userEntity = userService.getUserById(currentUser.getId());
+        UserEntity userEntity = userService.getUserById(currentUserId);
         boolean isFavorite = currentBook.getFavorites().stream().anyMatch((e) -> e.getId().equals(userEntity.getId()));
         if (isFavorite) {
             throw new AppException(AppError.BOOK_ALREADY_FAVORITED);
         }
         currentBook.getFavorites().add(userEntity);
         BookEntity book = bookRepository.save(currentBook);
-        return convertToBookResponseDto(book, currentUser.getId());
+        return convertToBookResponseDto(book, currentUserId);
     }
 
     @Override
     @Transactional
-    public void unfavorite(long id, AppUserDetails userDetails) {
+    public void unfavorite(long id, Long currentUserId) {
         BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
-        UserEntity userEntity = userService.getUserById(userDetails.getId());
+        UserEntity userEntity = userService.getUserById(currentUserId);
         boolean isFavorite = currentBook.getFavorites().stream().anyMatch((e) -> e.getId().equals(userEntity.getId()));
         if (!isFavorite) {
             throw new AppException(AppError.FAVORITE_NOT_FOUND);
