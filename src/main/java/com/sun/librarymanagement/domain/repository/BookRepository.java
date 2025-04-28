@@ -38,6 +38,7 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
                 AND (:author IS NULL OR LOWER(author.name) LIKE LOWER(CONCAT('%', :author, '%')))
                 AND (:name IS NULL OR LOWER(book.name) LIKE LOWER(CONCAT('%', :name, '%')))
                 AND (:description IS NULL OR LOWER(book.description) LIKE LOWER(CONCAT('%', :description, '%')))
+                AND book.deletedAt IS NULL
         """)
     Page<BookEntity> searchBook(
         @Param("publisher") String publisher,

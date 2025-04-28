@@ -36,7 +36,7 @@ public class PublisherController extends AdminController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePublisher(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePublisher(@PathVariable Long id) {
         publisherService.deletePublisher(id);
         return ResponseEntity.noContent().build();
     }
