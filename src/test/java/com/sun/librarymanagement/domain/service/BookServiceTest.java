@@ -12,6 +12,7 @@ import com.sun.librarymanagement.exception.AppException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,8 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.sun.librarymanagement.data.TestDataProvider.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -137,5 +137,45 @@ public class BookServiceTest {
         BookResponseDto result = bookService.favorite(bookId, userId);
         Assertions.assertNotNull(result);
         verify(bookRepository, times(1)).save(bookEntity);
+    }
+
+    @Test
+    void removeFavorite_BookNotFound() {
+        long bookId = 1L;
+        long userId = 2L;
+        when(bookRepository.findByIdWithLock(bookId)).thenReturn(Optional.empty());
+        assertThrows(AppException.class,
+            () -> bookService.favorite(bookId, userId), AppError.BOOK_NOT_FOUND.getMessage()
+        );
+    }
+
+    @Test
+    void removeFavorite_FavoriteNotFound() {
+        long bookId = 1L;
+        long userId = 2L;
+        UserEntity userEntity = defaultUserEntity();
+        BookEntity bookEntity = defaultBookEntity();
+        when(bookRepository.findByIdWithLock(bookId)).thenReturn(Optional.of(bookEntity));
+        when(userService.getUserById(userId)).thenReturn(userEntity);
+        assertThrows(AppException.class, () -> {
+            bookService.unfavorite(bookId, userId);
+        }, AppError.FAVORITE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void removeFavorite_Success_ShouldRemoveFavoriteAndSave() {
+        Long bookId = 1L;
+        Long userId = 2L;
+        UserEntity userEntity = defaultUserEntity();
+        BookEntity bookEntity = defaultBookEntity();
+        bookEntity.setId(bookId);
+        bookEntity.setFavorites(Set.of(userEntity));
+        when(bookRepository.findByIdWithLock(bookId)).thenReturn(Optional.of(bookEntity));
+        when(userService.getUserById(userId)).thenReturn(userEntity);
+        bookService.unfavorite(bookId, userId);
+        ArgumentCaptor<BookEntity> bookCaptor = ArgumentCaptor.forClass(BookEntity.class);
+        verify(bookRepository, times(1)).save(bookCaptor.capture());
+        BookEntity savedBook = bookCaptor.getValue();
+        assertFalse(savedBook.getFavorites().contains(userEntity));
     }
 }
