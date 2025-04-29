@@ -5,10 +5,7 @@ import com.sun.librarymanagement.domain.dto.request.SearchBookRequestDto;
 import com.sun.librarymanagement.domain.dto.response.BookResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.entity.*;
-import com.sun.librarymanagement.domain.repository.AuthorRepository;
-import com.sun.librarymanagement.domain.repository.BookRepository;
-import com.sun.librarymanagement.domain.repository.CategoryRepository;
-import com.sun.librarymanagement.domain.repository.PublisherRepository;
+import com.sun.librarymanagement.domain.repository.*;
 import com.sun.librarymanagement.domain.service.BookService;
 import com.sun.librarymanagement.domain.service.UserService;
 import com.sun.librarymanagement.exception.AppError;
@@ -38,6 +35,8 @@ public class BookServiceImpl implements BookService {
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
     private final BookRepository bookRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final UserService userService;
 
@@ -125,7 +124,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookResponseDto favorite(long id, Long currentUserId) {
+    public BookResponseDto favorite(long id, long currentUserId) {
         BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
         UserEntity userEntity = userService.getUserById(currentUserId);
         boolean isFavorite = Optional.ofNullable(currentBook.getFavorites())
@@ -145,7 +144,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void unfavorite(long id, Long currentUserId) {
+    public void unfavorite(long id, long currentUserId) {
         BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
         UserEntity userEntity = userService.getUserById(currentUserId);
         boolean isFavorite = Optional.ofNullable(currentBook.getFavorites())
@@ -162,7 +161,7 @@ public class BookServiceImpl implements BookService {
         bookRepository.save(currentBook);
     }
 
-    private BookResponseDto convertToBookResponseDto(BookEntity bookEntity, Long currentUserId) {
+    private BookResponseDto convertToBookResponseDto(BookEntity bookEntity, long currentUserId) {
         return modelMapper
             .typeMap(BookEntity.class, BookResponseDto.class)
             .addMappings(

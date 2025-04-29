@@ -47,7 +47,8 @@ public class WebSecurityConfiguration {
                         ApiPaths.AUTHORS,
                         ApiPaths.AUTHORS + "/*",
                         ApiPaths.BOOKS,
-                        ApiPaths.BOOKS + "/*"
+                        ApiPaths.BOOKS + "/*",
+                        ApiPaths.COMMENTS
                     )
                     .permitAll()
                     .requestMatchers(

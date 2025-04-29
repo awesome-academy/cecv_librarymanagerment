@@ -31,6 +31,9 @@ public enum AppError {
     BOOK_NOT_FOUND("Book not found", HttpStatus.NOT_FOUND),
     FAVORITE_NOT_FOUND("Favorite not found.", HttpStatus.NOT_FOUND),
     BOOK_ALREADY_FAVORITED("Favorite already favorited.", HttpStatus.CONFLICT),
+    COMMENT_NOT_FOUND("Comment not found", HttpStatus.NOT_FOUND),
+    COMMENT_NOT_ASSOCIATED_WITH_BOOK("Comment is not associated with this book.", HttpStatus.BAD_REQUEST),
+    COMMENT_NOT_ASSOCIATED_WITH_USER("Comment is not associated with this user.", HttpStatus.BAD_REQUEST)
     ;
 
     private final String message;
