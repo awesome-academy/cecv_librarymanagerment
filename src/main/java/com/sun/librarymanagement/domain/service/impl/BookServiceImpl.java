@@ -173,6 +173,17 @@ public class BookServiceImpl implements BookService {
         );
     }
 
+    public PaginatedResponseDto<BookResponseDto> getFavoriteBooks(int pageNumber, int pageSize, long currentUserId) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<BookEntity> page = bookRepository.getFavoriteBooks(currentUserId, pageable);
+        return new PaginatedResponseDto<>(
+                page.stream().map(book -> convertToBookResponseDto(book, currentUserId)).toList(),
+                pageNumber,
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
+    }
+
     private BookResponseDto convertToBookResponseDto(BookEntity bookEntity, long currentUserId) {
         return modelMapper
             .typeMap(BookEntity.class, BookResponseDto.class)
