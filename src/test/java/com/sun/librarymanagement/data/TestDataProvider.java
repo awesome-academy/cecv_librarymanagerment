@@ -15,6 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -99,7 +100,7 @@ public class TestDataProvider {
     }
 
     public static AuthorEntity defaultAuthorEntity() {
-        return new AuthorEntity("Luis Prats", "Bio", LocalDateTime.now());
+        return new AuthorEntity("Luis Prats", "Bio", LocalDate.now());
     }
 
     public static PaginatedResponseDto<CommentResponseDto> defaultPaginatedCommentResponse() {

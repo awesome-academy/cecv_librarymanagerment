@@ -18,5 +18,7 @@ public final class ApiPaths {
     public static final String USERS_ADMIN = BASE_API_ADMIN + "/users";
     public static final String FOLLOWS = BASE_API + "/follows";
     public static final String PROFILES = BASE_API + "/profiles";
+    public static final String BORROW_REQUESTS = BASE_API + "/borrow-requests";
+    public static final String BORROW_REQUESTS_ADMIN = BASE_API_ADMIN + "/borrow-requests";
     public static final String COMMENTS = BASE_API + "/comments";
 }
