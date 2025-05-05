@@ -46,6 +46,7 @@ public class WebSecurityConfiguration {
                         ApiPaths.PUBLISHERS + "/*",
                         ApiPaths.AUTHORS,
                         ApiPaths.AUTHORS + "/*",
+                        ApiPaths.CATEGORIES + "/**",
                         ApiPaths.BOOKS,
                         ApiPaths.BOOKS + "/*",
                         ApiPaths.COMMENTS

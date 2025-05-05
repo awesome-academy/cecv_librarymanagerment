@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "authors")
@@ -21,9 +21,9 @@ public class AuthorEntity extends BaseEntity {
 
     private String bio;
 
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
-    public AuthorEntity(String name, String bio, LocalDateTime dateOfBirth) {
+    public AuthorEntity(String name, String bio, LocalDate dateOfBirth) {
         this.name = name;
         this.bio = bio;
         this.dateOfBirth = dateOfBirth;

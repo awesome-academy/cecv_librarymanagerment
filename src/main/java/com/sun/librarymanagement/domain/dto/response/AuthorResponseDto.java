@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @Getter
@@ -23,7 +23,7 @@ public class AuthorResponseDto {
     private String bio;
 
     @JsonProperty("date_of_birth")
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @JsonProperty("is_following")
     private boolean isFollowing;
@@ -33,7 +33,7 @@ public class AuthorResponseDto {
         this.name = name;
     }
 
-    public AuthorResponseDto(long id, String name, String bio, LocalDateTime dateOfBirth) {
+    public AuthorResponseDto(long id, String name, String bio, LocalDate dateOfBirth) {
         this.id = id;
         this.name = name;
         this.bio = bio;

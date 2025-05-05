@@ -69,15 +69,16 @@ public class AuthServiceImpl implements AuthService {
         UserEntity userEntity = userRepository.findByEmail(email)
             .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
 
-        if (!userEntity.getIsVerified()) {
+        if (userEntity.getIsVerified()) {
             throw new AppException(AppError.USER_ALREADY_VERIFIED);
         }
 
         String verifyToken = UUID.randomUUID().toString();
         userEntity.setVerifyToken(verifyToken);
         userRepository.save(userEntity);
+        /* TODO: Pending function to send verification email.
         mailService.sendVerificationEmail(email, verifyToken);
-
+        */
         return new SuccessResponseDto("Verification email has been resent.");
     }
 

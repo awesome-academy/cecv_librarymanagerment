@@ -77,6 +77,7 @@ public class UserServiceImpl implements UserService {
 
     private UserResponseDto convertEntityToDto(UserEntity entity) {
         return UserResponseDto.builder()
+            .id(entity.getId())
             .username(entity.getUsername())
             .email(entity.getEmail())
             .isActive(entity.getIsActive())

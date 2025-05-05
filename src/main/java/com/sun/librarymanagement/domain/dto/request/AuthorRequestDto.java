@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 public class AuthorRequestDto {
@@ -15,5 +15,5 @@ public class AuthorRequestDto {
 
     private String bio;
 
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 }
