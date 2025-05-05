@@ -21,7 +21,7 @@ public interface BookService {
 
     PaginatedResponseDto<BookResponseDto> search(SearchBookRequestDto request, int pageNumber, int pageSize);
 
-    BookResponseDto favorite(long id, Long currentUserId);
+    BookResponseDto favorite(long id, long currentUserId);
 
-    void unfavorite(long id, Long currentUserId);
+    void unfavorite(long id, long currentUserId);
 }
