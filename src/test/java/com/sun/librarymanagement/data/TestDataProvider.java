@@ -1,16 +1,26 @@
 package com.sun.librarymanagement.data;
 
+import com.sun.librarymanagement.domain.dto.request.CommentRequestDto;
 import com.sun.librarymanagement.domain.dto.request.SearchBookRequestDto;
 import com.sun.librarymanagement.domain.dto.response.*;
-import com.sun.librarymanagement.domain.entity.AuthorEntity;
-import com.sun.librarymanagement.domain.entity.BookEntity;
-import com.sun.librarymanagement.domain.entity.PublisherEntity;
-import com.sun.librarymanagement.domain.entity.UserEntity;
+import com.sun.librarymanagement.domain.entity.*;
 import com.sun.librarymanagement.domain.model.UserRole;
+import com.sun.librarymanagement.security.AppUserDetails;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 
 public class TestDataProvider {
 
@@ -90,5 +100,21 @@ public class TestDataProvider {
 
     public static AuthorEntity defaultAuthorEntity() {
         return new AuthorEntity("Luis Prats", "Bio", LocalDateTime.now());
+    }
+
+    public static PaginatedResponseDto<CommentResponseDto> defaultPaginatedCommentResponse() {
+        return new PaginatedResponseDto<>(List.of(defaultCommentResponse()), 0L, 1, 1L);
+    }
+
+    public static CommentResponseDto defaultCommentResponse() {
+        return new CommentResponseDto(1L, "Harper Voyager");
+    }
+
+    public static CommentRequestDto defaultCommentRequest() {
+        return new CommentRequestDto("Harper Voyager");
+    }
+
+    public static CommentEntity defaultCommentEntity() {
+        return new CommentEntity("Harper Voyager", defaultUserEntity(), defaultBookEntity());
     }
 }
