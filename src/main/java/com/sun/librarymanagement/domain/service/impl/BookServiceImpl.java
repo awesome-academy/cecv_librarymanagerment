@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -159,6 +160,17 @@ public class BookServiceImpl implements BookService {
         favorites.remove(userEntity);
         currentBook.setFavorites(favorites);
         bookRepository.save(currentBook);
+    }
+
+    @Override
+    public List<BookEntity> search(SearchBookRequestDto request) {
+        return bookRepository.searchBook(
+            request.getPublisher(),
+            request.getCategory(),
+            request.getAuthor(),
+            request.getName(),
+            request.getDescription()
+        );
     }
 
     private BookResponseDto convertToBookResponseDto(BookEntity bookEntity, long currentUserId) {

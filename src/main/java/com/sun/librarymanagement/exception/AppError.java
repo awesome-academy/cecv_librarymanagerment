@@ -33,7 +33,8 @@ public enum AppError {
     BOOK_ALREADY_FAVORITED("Favorite already favorited.", HttpStatus.CONFLICT),
     COMMENT_NOT_FOUND("Comment not found", HttpStatus.NOT_FOUND),
     COMMENT_NOT_ASSOCIATED_WITH_BOOK("Comment is not associated with this book.", HttpStatus.BAD_REQUEST),
-    COMMENT_NOT_ASSOCIATED_WITH_USER("Comment is not associated with this user.", HttpStatus.BAD_REQUEST)
+    COMMENT_NOT_ASSOCIATED_WITH_USER("Comment is not associated with this user.", HttpStatus.BAD_REQUEST),
+    EXCEL_EXPORT_FAILED("Failed to export Excel file", HttpStatus.INTERNAL_SERVER_ERROR)
     ;
 
     private final String message;

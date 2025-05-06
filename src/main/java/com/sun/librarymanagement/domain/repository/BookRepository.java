@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -47,5 +48,25 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
         @Param("name") String name,
         @Param("description") String description,
         Pageable pageable
+    );
+
+    @Query("""
+            SELECT book FROM BookEntity book
+            JOIN book.categories category
+            JOIN book.publisher publisher
+            JOIN book.author author
+            WHERE (:publisher IS NULL OR LOWER(publisher.name) LIKE LOWER(CONCAT('%', :publisher, '%')))
+                AND (:category IS NULL OR LOWER(category.name) LIKE LOWER(CONCAT('%', :category, '%')))
+                AND (:author IS NULL OR LOWER(author.name) LIKE LOWER(CONCAT('%', :author, '%')))
+                AND (:name IS NULL OR LOWER(book.name) LIKE LOWER(CONCAT('%', :name, '%')))
+                AND (:description IS NULL OR LOWER(book.description) LIKE LOWER(CONCAT('%', :description, '%')))
+                AND book.deletedAt IS NULL
+        """)
+    List<BookEntity> searchBook(
+        @Param("publisher") String publisher,
+        @Param("category") String category,
+        @Param("author") String author,
+        @Param("name") String name,
+        @Param("description") String description
     );
 }
