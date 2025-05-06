@@ -8,6 +8,7 @@ import com.sun.librarymanagement.security.AppUserDetails;
 import com.sun.librarymanagement.utils.ApiPaths;
 import com.sun.librarymanagement.utils.Constant;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,8 +24,8 @@ public class CommentController {
     @GetMapping
     public ResponseEntity<PaginatedResponseDto<CommentResponseDto>> allComment(
         @RequestParam long id,
-        @RequestParam(defaultValue = Constant.DEFAULT_PAGE_NUMBER, name = Constant.PAGE_NUMBER_PARAM) int pageNumber,
-        @RequestParam(defaultValue = Constant.DEFAULT_PAGE_SIZE, name = Constant.PAGE_SIZE_PARAM) int pageSize
+        @RequestParam(defaultValue = Constant.DEFAULT_PAGE_NUMBER, name = Constant.PAGE_NUMBER_PARAM) @Min(0)  int pageNumber,
+        @RequestParam(defaultValue = Constant.DEFAULT_PAGE_SIZE, name = Constant.PAGE_SIZE_PARAM) @Min(1)  int pageSize
     ) {
         return ResponseEntity.ok(commentService.allComments(id, pageNumber, pageSize));
     }
