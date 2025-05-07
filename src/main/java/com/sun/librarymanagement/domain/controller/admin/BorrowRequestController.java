@@ -6,6 +6,7 @@ import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.service.BorrowRequestService;
 import com.sun.librarymanagement.utils.ApiPaths;
 import com.sun.librarymanagement.utils.Constant;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,9 @@ public class BorrowRequestController extends AdminController {
     }
 
     @PatchMapping("/{id}/approve")
-    public ResponseEntity<BorrowRequestResponseDto> approveBorrowRequest(@PathVariable Long id) {
+    public ResponseEntity<BorrowRequestResponseDto> approveBorrowRequest(
+        @PathVariable Long id
+    ) throws MessagingException {
         return ResponseEntity.ok(borrowRequestService.approveBorrowRequest(id));
     }
 
@@ -40,7 +43,7 @@ public class BorrowRequestController extends AdminController {
     public ResponseEntity<BorrowRequestResponseDto> rejectBorrowRequest(
         @PathVariable Long id,
         @RequestBody @Valid RejectBorrowRequestRequestDto request
-    ) {
+    ) throws MessagingException {
         return ResponseEntity.ok(borrowRequestService.rejectBorrowRequest(id, request));
     }
 

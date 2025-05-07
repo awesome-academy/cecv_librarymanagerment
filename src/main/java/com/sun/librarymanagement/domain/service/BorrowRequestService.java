@@ -5,6 +5,7 @@ import com.sun.librarymanagement.domain.dto.request.RejectBorrowRequestRequestDt
 import com.sun.librarymanagement.domain.dto.response.BorrowRequestResponseDto;
 import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.security.AppUserDetails;
+import jakarta.mail.MessagingException;
 
 public interface BorrowRequestService {
 
@@ -19,9 +20,12 @@ public interface BorrowRequestService {
 
     BorrowRequestResponseDto cancelBorrowRequest(Long id, AppUserDetails userDetails);
 
-    BorrowRequestResponseDto approveBorrowRequest(Long id);
+    BorrowRequestResponseDto approveBorrowRequest(Long id) throws MessagingException;
 
-    BorrowRequestResponseDto rejectBorrowRequest(Long id, RejectBorrowRequestRequestDto borrowRequest);
+    BorrowRequestResponseDto rejectBorrowRequest(
+        Long id,
+        RejectBorrowRequestRequestDto borrowRequest
+    ) throws MessagingException;
 
     BorrowRequestResponseDto borrowBooks(Long borrowRequestId);
 
