@@ -34,4 +34,6 @@ public interface BorrowRequestService {
     BorrowRequestResponseDto getCurrentUserBorrowRequest(Long id, AppUserDetails userDetails);
 
     BorrowRequestResponseDto cancelBorrowRequest(Long id, AppUserDetails userDetails);
+
+    void sendBookReturnReminderEmail(String username, String email);
 }

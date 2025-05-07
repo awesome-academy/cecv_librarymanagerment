@@ -20,9 +20,12 @@ import com.sun.librarymanagement.exception.AppException;
 import com.sun.librarymanagement.security.AppUserDetails;
 import com.sun.librarymanagement.utils.MapperConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,10 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
     private final BorrowRequestRepository borrowRequestRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String senderEmail;
 
     @Override
     public BorrowRequestResponseDto createBorrowRequest(
@@ -252,5 +259,15 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         }
 
         return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
+    }
+
+    @Override
+    public void sendBookReturnReminderEmail(String username, String email) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(email);
+        message.setSubject("Reminder: Book Return");
+        message.setText("Dear " + username + ", you need to return your book tomorrow.");
+        mailSender.send(message);
     }
 }

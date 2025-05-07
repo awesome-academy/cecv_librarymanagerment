@@ -1,6 +1,7 @@
 package com.sun.librarymanagement.domain.repository;
 
 import com.sun.librarymanagement.domain.entity.BorrowRequestEntity;
+import com.sun.librarymanagement.domain.entity.UserEntity;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,4 +30,12 @@ public interface BorrowRequestRepository extends JpaRepository<BorrowRequestEnti
     @EntityGraph("fetch-borrower-detailList")
     @Query("SELECT request FROM BorrowRequestEntity request WHERE request.borrower.id = :id ORDER BY request.createdAt DESC")
     Page<BorrowRequestEntity> findByBorrowerId(@Param("id") Long borrowerId, Pageable pageable);
+
+    @Query("""
+            SELECT DISTINCT borrow.borrower FROM BorrowRequestDetailEntity borrowDetail
+            JOIN borrowDetail.borrowRequest borrow
+            WHERE borrowDetail.returnDate = :targetDate
+            AND borrowDetail.status = 'BORROWED'
+        """)
+    List<UserEntity> findBorrowersWithBooksDueOn(@Param("targetDate") LocalDate targetDate);
 }
