@@ -40,6 +40,7 @@ public class BookServiceImpl implements BookService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final UserService userService;
+    private final RateRepository rateRepository;
 
     @Override
     public BookResponseDto addBook(@NotNull BookRequestDto request) {
@@ -174,7 +175,7 @@ public class BookServiceImpl implements BookService {
     }
 
     private BookResponseDto convertToBookResponseDto(BookEntity bookEntity, long currentUserId) {
-        return modelMapper
+        BookResponseDto bookResponseDto = modelMapper
             .typeMap(BookEntity.class, BookResponseDto.class)
             .addMappings(
                 mapper -> mapper
@@ -182,5 +183,8 @@ public class BookServiceImpl implements BookService {
                     .map(src -> src, BookResponseDto::setFavorited)
             )
             .map(bookEntity);
+        Optional<RateEntity> rateEntity = rateRepository.findById(currentUserId, bookEntity.getId());
+        rateEntity.ifPresent(entity -> bookResponseDto.setRate(entity.getRate()));
+        return bookResponseDto;
     }
 }

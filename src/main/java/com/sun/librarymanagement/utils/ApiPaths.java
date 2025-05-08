@@ -21,4 +21,5 @@ public final class ApiPaths {
     public static final String BORROW_REQUESTS = BASE_API + "/borrow-requests";
     public static final String BORROW_REQUESTS_ADMIN = BASE_API_ADMIN + "/borrow-requests";
     public static final String COMMENTS = BASE_API + "/comments";
+    public static final String RATES = BASE_API + "/rates";
 }

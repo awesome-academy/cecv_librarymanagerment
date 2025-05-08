@@ -35,4 +35,6 @@ public class BookResponseDto {
 
     @JsonProperty("is_favorited")
     private boolean isFavorited;
+
+    private int rate;
 }
