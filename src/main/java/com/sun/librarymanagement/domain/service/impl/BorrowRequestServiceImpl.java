@@ -3,7 +3,8 @@ package com.sun.librarymanagement.domain.service.impl;
 import com.sun.librarymanagement.domain.dto.request.CreateBorrowRequestDetailRequestDto;
 import com.sun.librarymanagement.domain.dto.request.CreateBorrowRequestRequestDto;
 import com.sun.librarymanagement.domain.dto.request.RejectBorrowRequestRequestDto;
-import com.sun.librarymanagement.domain.dto.response.*;
+import com.sun.librarymanagement.domain.dto.response.BorrowRequestResponseDto;
+import com.sun.librarymanagement.domain.dto.response.PaginatedResponseDto;
 import com.sun.librarymanagement.domain.entity.BookEntity;
 import com.sun.librarymanagement.domain.entity.BorrowRequestDetailEntity;
 import com.sun.librarymanagement.domain.entity.BorrowRequestEntity;
@@ -17,6 +18,7 @@ import com.sun.librarymanagement.domain.service.BorrowRequestService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
 import com.sun.librarymanagement.security.AppUserDetails;
+import com.sun.librarymanagement.utils.MapperConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +72,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setDetailList(detailList);
         borrowRequestRepository.save(borrowRequestEntity);
 
-        return convertEntityToDto(borrowRequestEntity);
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Override
@@ -80,7 +81,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         Page<BorrowRequestEntity> page = borrowRequestRepository.findAllWithBorrowerAndDetails(pageable);
 
         return new PaginatedResponseDto<>(
-            convertToBorrowRequestList(page),
+            MapperConverter.convertToBorrowRequestList(page),
             pageNumber,
             page.getTotalPages(),
             page.getTotalElements()
@@ -92,7 +93,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         BorrowRequestEntity borrowRequestEntity = borrowRequestRepository.findById(id)
             .orElseThrow(() -> new AppException(AppError.BORROW_REQUEST_NOT_FOUND));
 
-        return convertEntityToDto(borrowRequestEntity);
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Transactional
@@ -113,7 +114,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setStatus(BorrowRequestStatus.CANCELLED);
         borrowRequestRepository.save(borrowRequestEntity);
 
-        return convertEntityToDto(borrowRequestEntity);
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Transactional
@@ -141,7 +142,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setStatus(BorrowRequestStatus.APPROVED);
         borrowRequestRepository.save(borrowRequestEntity);
 
-        return convertEntityToDto(borrowRequestEntity);
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Transactional
@@ -160,7 +161,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setStatusNote(request.getReason());
         borrowRequestRepository.save(borrowRequestEntity);
 
-        return convertEntityToDto(borrowRequestEntity);
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Transactional
@@ -184,7 +185,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setDetailList(detailList);
         borrowRequestRepository.save(borrowRequestEntity);
 
-        return convertEntityToDto(borrowRequestEntity);
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Transactional
@@ -215,7 +216,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setStatus(BorrowRequestStatus.COMPLETED);
         borrowRequestRepository.save(borrowRequestEntity);
 
-        return convertEntityToDto(borrowRequestEntity);
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Override
@@ -231,64 +232,25 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         Page<BorrowRequestEntity> page = borrowRequestRepository.findByBorrowerId(userEntity.getId(), pageable);
 
         return new PaginatedResponseDto<>(
-            convertToBorrowRequestList(page),
+            MapperConverter.convertToBorrowRequestList(page),
             pageNumber,
             page.getTotalPages(),
             page.getTotalElements()
         );
     }
 
-    private BorrowRequestResponseDto convertEntityToDto(BorrowRequestEntity entity) {
-        return BorrowRequestResponseDto.builder()
-            .id(entity.getId())
-            .borrower(convertEntityToDto(entity.getBorrower()))
-            .status(entity.getStatus())
-            .statusNote(entity.getStatusNote())
-            .startDate(entity.getStartDate())
-            .endDate(entity.getEndDate())
-            .details(convertToBorrowRequestDetailList(entity.getDetailList()))
-            .build();
-    }
+    @Override
+    public BorrowRequestResponseDto getCurrentUserBorrowRequest(Long id, AppUserDetails userDetails) {
+        UserEntity userEntity = userRepository.findById(userDetails.getId())
+            .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
 
-    private BorrowRequestDetailResponseDto convertEntityToDto(BorrowRequestDetailEntity entity) {
-        return BorrowRequestDetailResponseDto.builder()
-            .id(entity.getId())
-            .book(convertEntityToDto(entity.getBook()))
-            .quantity(entity.getQuantity())
-            .status(entity.getStatus())
-            .borrowDate(entity.getBorrowDate())
-            .returnDate(entity.getReturnDate())
-            .build();
-    }
+        BorrowRequestEntity borrowRequestEntity = borrowRequestRepository.findById(id)
+            .orElseThrow(() -> new AppException(AppError.BORROW_REQUEST_NOT_FOUND));
 
-    private UserResponseDto convertEntityToDto(UserEntity entity) {
-        return UserResponseDto.builder()
-            .id(entity.getId())
-            .username(entity.getUsername())
-            .email(entity.getEmail())
-            .build();
-    }
+        if (!borrowRequestEntity.getBorrower().getId().equals(userEntity.getId())) {
+            throw new AppException(AppError.BORROW_REQUEST_INVALID);
+        }
 
-    private BookResponseDto convertEntityToDto(BookEntity entity) {
-        return BookResponseDto.builder()
-            .id(entity.getId())
-            .name(entity.getName())
-            .build();
-    }
-
-    private List<BorrowRequestResponseDto> convertToBorrowRequestList(
-        Page<BorrowRequestEntity> borrowRequestEntities
-    ) {
-        return borrowRequestEntities.stream()
-            .map(this::convertEntityToDto)
-            .collect(Collectors.toList());
-    }
-
-    private List<BorrowRequestDetailResponseDto> convertToBorrowRequestDetailList(
-        List<BorrowRequestDetailEntity> borrowRequestDetailEntities
-    ) {
-        return borrowRequestDetailEntities.stream()
-            .map(this::convertEntityToDto)
-            .collect(Collectors.toList());
+        return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 }

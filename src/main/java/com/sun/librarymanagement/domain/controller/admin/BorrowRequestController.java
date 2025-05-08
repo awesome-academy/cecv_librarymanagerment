@@ -19,7 +19,7 @@ public class BorrowRequestController extends AdminController {
     private final BorrowRequestService borrowRequestService;
 
     @GetMapping
-    public ResponseEntity<PaginatedResponseDto<BorrowRequestResponseDto>> getBorrowRequests(
+    public ResponseEntity<PaginatedResponseDto<BorrowRequestResponseDto>> index(
         @RequestParam(defaultValue = Constant.DEFAULT_PAGE_NUMBER, name = Constant.PAGE_NUMBER_PARAM) int pageNumber,
         @RequestParam(defaultValue = Constant.DEFAULT_PAGE_SIZE, name = Constant.PAGE_SIZE_PARAM) int pageSize
     ) {
@@ -27,17 +27,17 @@ public class BorrowRequestController extends AdminController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BorrowRequestResponseDto> getBorrowRequest(@PathVariable Long id) {
+    public ResponseEntity<BorrowRequestResponseDto> show(@PathVariable Long id) {
         return ResponseEntity.ok(borrowRequestService.getBorrowRequest(id));
     }
 
     @PatchMapping("/{id}/approve")
-    public ResponseEntity<BorrowRequestResponseDto> approveBorrowRequest(@PathVariable Long id) {
+    public ResponseEntity<BorrowRequestResponseDto> approve(@PathVariable Long id) {
         return ResponseEntity.ok(borrowRequestService.approveBorrowRequest(id));
     }
 
     @PatchMapping("/{id}/reject")
-    public ResponseEntity<BorrowRequestResponseDto> rejectBorrowRequest(
+    public ResponseEntity<BorrowRequestResponseDto> reject(
         @PathVariable Long id,
         @RequestBody @Valid RejectBorrowRequestRequestDto request
     ) {

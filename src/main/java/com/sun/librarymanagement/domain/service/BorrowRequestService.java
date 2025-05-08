@@ -8,16 +8,9 @@ import com.sun.librarymanagement.security.AppUserDetails;
 
 public interface BorrowRequestService {
 
-    BorrowRequestResponseDto createBorrowRequest(
-        CreateBorrowRequestRequestDto borrowRequest,
-        AppUserDetails userDetails
-    );
-
     PaginatedResponseDto<BorrowRequestResponseDto> getBorrowRequests(int pageNumber, int pageSize);
 
     BorrowRequestResponseDto getBorrowRequest(Long id);
-
-    BorrowRequestResponseDto cancelBorrowRequest(Long id, AppUserDetails userDetails);
 
     BorrowRequestResponseDto approveBorrowRequest(Long id);
 
@@ -27,9 +20,18 @@ public interface BorrowRequestService {
 
     BorrowRequestResponseDto returnBooks(Long borrowRequestId);
 
+    BorrowRequestResponseDto createBorrowRequest(
+        CreateBorrowRequestRequestDto borrowRequest,
+        AppUserDetails userDetails
+    );
+
     PaginatedResponseDto<BorrowRequestResponseDto> getCurrentUserBorrowRequests(
         int pageNumber,
         int pageSize,
         AppUserDetails userDetails
     );
+
+    BorrowRequestResponseDto getCurrentUserBorrowRequest(Long id, AppUserDetails userDetails);
+
+    BorrowRequestResponseDto cancelBorrowRequest(Long id, AppUserDetails userDetails);
 }
