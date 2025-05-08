@@ -21,9 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -121,45 +119,6 @@ public class BookServiceImpl implements BookService {
             page.getTotalPages(),
             page.getTotalElements()
         );
-    }
-
-    @Override
-    @Transactional
-    public BookResponseDto favorite(long id, long currentUserId) {
-        BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
-        UserEntity userEntity = userService.getUserById(currentUserId);
-        boolean isFavorite = Optional.ofNullable(currentBook.getFavorites())
-            .map(favorites -> favorites.stream().anyMatch(e -> e.getId().equals(userEntity.getId())))
-            .orElse(false);
-        if (isFavorite) {
-            throw new AppException(AppError.BOOK_ALREADY_FAVORITED);
-        }
-        Set<UserEntity> favorites = Optional.ofNullable(currentBook.getFavorites())
-            .map(HashSet::new)
-            .orElseGet(HashSet::new);
-        favorites.add(userEntity);
-        currentBook.setFavorites(favorites);
-        BookEntity book = bookRepository.save(currentBook);
-        return convertToBookResponseDto(book, currentUserId);
-    }
-
-    @Override
-    @Transactional
-    public void unfavorite(long id, long currentUserId) {
-        BookEntity currentBook = bookRepository.findByIdWithLock(id).orElseThrow(() -> new AppException(AppError.BOOK_NOT_FOUND));
-        UserEntity userEntity = userService.getUserById(currentUserId);
-        boolean isFavorite = Optional.ofNullable(currentBook.getFavorites())
-            .map(favorites -> favorites.stream().anyMatch(e -> e.getId().equals(userEntity.getId())))
-            .orElse(false);
-        if (!isFavorite) {
-            throw new AppException(AppError.FAVORITE_NOT_FOUND);
-        }
-        Set<UserEntity> favorites = Optional.of(currentBook.getFavorites())
-            .map(HashSet::new)
-            .orElseGet(HashSet::new);
-        favorites.remove(userEntity);
-        currentBook.setFavorites(favorites);
-        bookRepository.save(currentBook);
     }
 
     @Override

@@ -46,21 +46,4 @@ public class BookController {
     ) {
         return ResponseEntity.ok(bookService.search(request, pageNumber, pageSize));
     }
-
-    @PostMapping("{id}/favorite")
-    public ResponseEntity<BookResponseDto> favorite(
-        @PathVariable long id,
-        @AuthenticationPrincipal AppUserDetails currentUser
-    ) {
-        return ResponseEntity.ok(bookService.favorite(id, currentUser.getId()));
-    }
-
-    @DeleteMapping("{id}/favorite")
-    public ResponseEntity<BookResponseDto> unfavorite(
-        @PathVariable long id,
-        @AuthenticationPrincipal AppUserDetails currentUser
-    ) {
-        bookService.unfavorite(id, currentUser.getId());
-        return ResponseEntity.noContent().build();
-    }
 }
