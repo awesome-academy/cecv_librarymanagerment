@@ -15,10 +15,12 @@ import com.sun.librarymanagement.domain.repository.BookRepository;
 import com.sun.librarymanagement.domain.repository.BorrowRequestRepository;
 import com.sun.librarymanagement.domain.repository.UserRepository;
 import com.sun.librarymanagement.domain.service.BorrowRequestService;
+import com.sun.librarymanagement.domain.service.MailService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
 import com.sun.librarymanagement.security.AppUserDetails;
 import com.sun.librarymanagement.utils.MapperConverter;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +39,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
     private final BorrowRequestRepository borrowRequestRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final MailService mailService;
 
     @Override
     public BorrowRequestResponseDto createBorrowRequest(
@@ -119,7 +122,7 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
 
     @Transactional
     @Override
-    public BorrowRequestResponseDto approveBorrowRequest(Long id) {
+    public BorrowRequestResponseDto approveBorrowRequest(Long id) throws MessagingException {
         BorrowRequestEntity borrowRequestEntity = borrowRequestRepository.findByIdWithLock(id)
             .orElseThrow(() -> new AppException(AppError.BORROW_REQUEST_NOT_FOUND));
 
@@ -141,13 +144,23 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setDetailList(detailList);
         borrowRequestEntity.setStatus(BorrowRequestStatus.APPROVED);
         borrowRequestRepository.save(borrowRequestEntity);
+        mailService.sendBorrowRequestApprovedEmail(
+            borrowRequestEntity.getBorrower().getEmail(),
+            borrowRequestEntity.getBorrower().getUsername(),
+            borrowRequestEntity.getId().toString(),
+            borrowRequestEntity.getStartDate().toString(),
+            borrowRequestEntity.getEndDate().toString()
+        );
 
         return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }
 
     @Transactional
     @Override
-    public BorrowRequestResponseDto rejectBorrowRequest(Long id, RejectBorrowRequestRequestDto request) {
+    public BorrowRequestResponseDto rejectBorrowRequest(
+        Long id,
+        RejectBorrowRequestRequestDto request
+    ) throws MessagingException {
         BorrowRequestEntity borrowRequestEntity = borrowRequestRepository.findByIdWithLock(id)
             .orElseThrow(() -> new AppException(AppError.BORROW_REQUEST_NOT_FOUND));
 
@@ -160,6 +173,12 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
         borrowRequestEntity.setStatus(BorrowRequestStatus.REJECTED);
         borrowRequestEntity.setStatusNote(request.getReason());
         borrowRequestRepository.save(borrowRequestEntity);
+        mailService.sendBorrowRequestRejectedEmail(
+            borrowRequestEntity.getBorrower().getEmail(),
+            borrowRequestEntity.getBorrower().getUsername(),
+            borrowRequestEntity.getId().toString(),
+            borrowRequestEntity.getStatusNote()
+        );
 
         return MapperConverter.convertToBorrowRequestResponseDto(borrowRequestEntity);
     }

@@ -12,6 +12,7 @@ import com.sun.librarymanagement.domain.service.MailService;
 import com.sun.librarymanagement.exception.AppError;
 import com.sun.librarymanagement.exception.AppException;
 import com.sun.librarymanagement.security.JwtUtils;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public SuccessResponseDto registration(RegistrationRequestDto user) {
+    public SuccessResponseDto registration(RegistrationRequestDto user) throws MessagingException {
         userRepository.findByUsernameOrEmail(user.getUsername(), user.getEmail())
             .stream()
             .findAny()
@@ -44,11 +45,9 @@ public class AuthServiceImpl implements AuthService {
             .role(UserRole.USER)
             .verifyToken(verifyToken)
             .build();
-        userEntity.setIsVerified(true); // TODO: Pending function to send verification email.
         userRepository.save(userEntity);
-        /* TODO: Pending function to send verification email.
-        mailService.sendVerificationEmail(user.getEmail(), verifyToken);
-         */
+        mailService.sendVerificationEmail(userEntity.getEmail(), userEntity.getUsername(), verifyToken);
+
         return new SuccessResponseDto("Account created successfully. Please check your email to verify your account.");
     }
 
@@ -65,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public SuccessResponseDto resendVerification(String email) {
+    public SuccessResponseDto resendVerification(String email) throws MessagingException {
         UserEntity userEntity = userRepository.findByEmail(email)
             .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
 
@@ -76,9 +75,8 @@ public class AuthServiceImpl implements AuthService {
         String verifyToken = UUID.randomUUID().toString();
         userEntity.setVerifyToken(verifyToken);
         userRepository.save(userEntity);
-        /* TODO: Pending function to send verification email.
-        mailService.sendVerificationEmail(email, verifyToken);
-        */
+        mailService.sendVerificationEmail(userEntity.getEmail(), userEntity.getUsername(), verifyToken);
+
         return new SuccessResponseDto("Verification email has been resent.");
     }
 

@@ -7,6 +7,7 @@ import com.sun.librarymanagement.domain.dto.response.SuccessResponseDto;
 import com.sun.librarymanagement.domain.dto.response.UserResponseDto;
 import com.sun.librarymanagement.domain.service.AuthService;
 import com.sun.librarymanagement.utils.ApiPaths;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<SuccessResponseDto> registration(@RequestBody @Valid RegistrationRequestDto user) {
+    public ResponseEntity<SuccessResponseDto> registration(
+        @RequestBody @Valid RegistrationRequestDto user
+    ) throws MessagingException {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(authService.registration(user));
@@ -35,7 +38,7 @@ public class AuthController {
     @PostMapping("/verify/resend")
     public ResponseEntity<SuccessResponseDto> resendVerificationEmail(
         @RequestBody @Valid ResendVerificationEmailRequestDto verification
-    ) {
+    ) throws MessagingException {
         return ResponseEntity.ok(authService.resendVerification(verification.getEmail()));
     }
 
