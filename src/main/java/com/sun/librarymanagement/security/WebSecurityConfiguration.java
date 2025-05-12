@@ -57,6 +57,10 @@ public class WebSecurityConfiguration {
                         ApiPaths.BOOKS + "/search"
                     )
                     .permitAll()
+                    .requestMatchers(
+                        ApiPaths.RATES,
+                        ApiPaths.RATES + "/*"
+                    ).hasRole(UserRole.USER.name())
                     .requestMatchers(ApiPaths.BASE_API_ADMIN + "/**").hasRole(UserRole.ADMIN.name())
                     .anyRequest()
                     .authenticated()
