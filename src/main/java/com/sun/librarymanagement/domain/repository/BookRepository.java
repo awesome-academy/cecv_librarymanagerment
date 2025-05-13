@@ -69,4 +69,15 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
         @Param("name") String name,
         @Param("description") String description
     );
+
+    @Query("""
+            SELECT book FROM BookEntity book
+            LEFT JOIN book.favorites user
+            WHERE user.id = :userId
+                AND book.deletedAt IS NULL
+        """)
+    Page<BookEntity> getFavoriteBooks(
+            long userId,
+            Pageable pageable
+    );
 }
