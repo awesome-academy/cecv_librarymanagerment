@@ -1,7 +1,8 @@
-package com.sun.librarymanagement.domain.service;
+package com.sun.librarymanagement.domain.scheduler;
 
 import com.sun.librarymanagement.domain.entity.UserEntity;
 import com.sun.librarymanagement.domain.repository.BorrowRequestRepository;
+import com.sun.librarymanagement.domain.service.BorrowRequestService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

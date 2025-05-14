@@ -1,4 +1,4 @@
-package com.sun.librarymanagement.domain.service;
+package com.sun.librarymanagement.domain.scheduler;
 
 import com.sun.librarymanagement.domain.entity.UserEntity;
 import com.sun.librarymanagement.domain.repository.UserRepository;
@@ -15,14 +15,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UnverifiedAccountCleanupService {
+public class UnverifiedAccountCleanupScheduler {
 
     private final UserRepository userRepository;
 
     @Value("${app.account.activation-expiry-time:24}")
     private int activationExpiryTime;
 
-    private static final Logger logger = LoggerFactory.getLogger(UnverifiedAccountCleanupService.class);
+    private static final Logger logger = LoggerFactory.getLogger(UnverifiedAccountCleanupScheduler.class);
 
     @Transactional
     @Scheduled(cron = "${scheduling.jobs.cleanup-unverified-accounts.cron:0 0 0 * * ?}")

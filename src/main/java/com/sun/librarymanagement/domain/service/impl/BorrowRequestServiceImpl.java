@@ -263,6 +263,9 @@ public class BorrowRequestServiceImpl implements BorrowRequestService {
 
     @Override
     public void sendBookReturnReminderEmail(String username, String email) {
+        if (username == null || username.isBlank() || email == null || email.isBlank()) {
+            return;
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
         message.setTo(email);
